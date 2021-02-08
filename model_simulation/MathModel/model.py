@@ -1,3 +1,4 @@
+
 import random
 import math
 import numpy as np
@@ -9,11 +10,11 @@ from node import Node, Sybil, Malicious
 class Model(object):
     def __init__(self, count, m_count):
         self.counts = count
-        self.sybils = []
-        self.normals = []
+        self.sybils = Sybil(m_count)
+        self.normals = Node()
         self.graph = []
         self.score = []
-        self.reveal_times = {}
+        self.reveal_times = []
         # Will be reconstruct later
         self.round = 2 * int(math.log(count, 2))
         print("Rounds:", self.round)
@@ -38,28 +39,27 @@ class Model(object):
         for k in range(0, len(listeners), 2):
             if k + 1 == len(listeners):
                 break
-            if listeners[k] in self.sybils and listeners[k + 1] in self.sybils:
+            if (self.sybils.is_this_type(listeners[k]) or self.sybils.malicious.is_this_type(listeners[k])) and \
+                    (self.sybils.is_this_type(listeners[k + 1]) or self.sybils.malicious.is_this_type(listeners[k + 1])):
                 for l in senders:
-                    if l in self.normals:
+                    if l in self.normals.nodelist:
                         self.score[l] = self.score[l] + 1
+                        self.sybils.add_score(listeners[k], listeners[k+1], l)
+                        self.sybils.add_score(listeners[k+1], listeners[k], l)
             pass
 
-    def _report_sybils(self, sybil_id, listeners, senders, reveal_times=1):
-        if self.reveal_times[sybil_id] >= reveal_times:
+    def _report_sybils(self, listeners, senders):
+        victims = self.sybils.select_victim(senders)
+        if len(victims) == 0:
             return
-        if sybil_id in senders:
-            self.reveal_times[sybil_id] = self.reveal_times[sybil_id] + 1
-            templist = []
-            for k in self.sybils:
-                if k in senders and k != sybil_id:
-                    templist.append(k)
-            victim = random.choice(self.sybils)
-            for k in range(0, len(listeners), 2):
-                if k + 1 == len(listeners):
-                    break
-                if listeners[k] in self.normals and listeners[k + 1] in self.normals:
-                    self.score[sybil_id] = self.score[sybil_id] + 1
+        for k in range(0, len(listeners), 2):
+            if k + 1 == len(listeners):
+                break
+            if self.normals.is_this_type(listeners[k]) and self.normals.is_this_type(listeners[k+1]):
+                for victim in victims:
                     self.score[victim] = self.score[victim] + 1
+                    self.normals.add_score(listeners[k], listeners[k + 1], victim)
+                    self.normals.add_score(listeners[k + 1], listeners[k], victim)
 
     def report(self):
         for j in range(self.round):
@@ -71,13 +71,13 @@ class Model(object):
                 else:
                     senders.append(i)
             self._report_normals(listeners, senders)
-            self._report_sybils(self.sybils[0], listeners, senders, reveal_times=reveal_times)
+            self._report_sybils(listeners, senders)
 
     def score_display(self, type="N"):
         temp = []
         print("Total scores:", self.score)
         if type == "N":
-            for i in self.normals:
+            for i in self.normals.nodelist:
                 temp.append(self.score[i])
             print("Normal scores:", temp)
         else:
@@ -88,19 +88,60 @@ class Model(object):
         nodelist = list(range(self.counts))
         self.sybils.clear()
         self.normals.clear()
-        self.reveal_times = {}
         self.graph = np.zeros((self.counts, self.round), dtype=int).tolist()
         self.score = np.zeros(self.counts, dtype=int).tolist()
         sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
         for i in sybils:
-            self.sybils.append(i)
+            self.sybils.add_node(i)
         for i in nodelist:
-            if i in self.sybils:
+            if self.sybils.is_this_type(i):
                 continue
-            self.normals.append(i)
-        self.reveal_times[self.sybils[0]] = 0
-        print("Normals:", self.normals)
-        print("Sybils:", self.sybils)
+            self.normals.add_node(i)
+        self.sybils.select_malicious()
+        print("Normals:", self.normals.nodelist)
+        print("Sybils:", self.sybils.nodelist)
+        print("Malicious:", self.sybils.malicious.nodelist)
+        pass
+
+    def hunt(self):
+        normal_list = list(range(number_of_nodes))
+        score_list = self.score.copy()
+        # max = 0
+        # for i in range(len(self.score)):
+        #     if self.score[i] > max:
+        #         max = self.score[i]
+        # if max <= 5:
+        #     #need to check the other method.
+        #     if:
+        #       the we can find some nodes can be detected as sybils, continue on the other methods
+        #     else:
+        #       return to this method
+        while True:
+            node = 0
+            max = 0
+            for i in range(len(score_list)):
+                if score_list[i] > max:
+                    max = score_list[i]
+                    node = i
+            if max <= 2:
+                break
+            suspect = None
+            if node in self.normals.nodelist:
+                suspect = self.normals.score_dict
+            if node in self.sybils.nodelist:
+                suspect = self.sybils.score_dict
+            for company_id in suspect[node]: # go through to find all scores ought to be subtracted
+                company_dict = suspect[node][company_id]
+                for node_id, node_score in company_dict.items():
+                    score_list[node_id] = score_list[node_id] - node_score
+                suspect[company_id].pop(node)
+            score_list[node] = 0
+            normal_list.remove(node)
+
+        print("Detection results:", normal_list, len(normal_list))
+
+
+    def judgement(self):
         pass
 
 
@@ -126,29 +167,32 @@ def plot_both(normal, sybils):
     label_score = []
     plot_scores(normal)
     plot_scores(sybils, color='r', name_label='sybils', bar_width=0.5)
-    plt.title('Sybil percent:' + str(sybil_percent*100) + "%")
+    plt.title('Sybil percent:' + str(sybil_percent*100) + "%/Total nodes:" + str(number_of_nodes)
+              + "/Malicious:" + str(m_count))
+    plt.xlabel("score")
+    plt.ylabel("node number")
     plt.legend()
     plt.show()
 
 
 number_of_nodes = 16
-sybil_percent = 0.33
+sybil_percent = 0.4
 m_count = 1
-reveal_times = 5
 normal_scores = []
 sybil_scores = []
 
 if __name__ == '__main__':
     model = Model(count=number_of_nodes, m_count=m_count)
 
-    for i in range(1000):
+    for i in range(2000):
         model.shuffle()
-        sybil_id = model.sybils[0]
-        normal_id = model.normals[0]
+        sybil_id = model.sybils.nodelist[0]
+        normal_id = model.normals.nodelist[0]
         model.iteration(0, 0, number_of_nodes)
         model.report()
         # print(node.graph)
         score = model.score_display()
+        model.hunt()
         normal_scores.append(score[normal_id])
         sybil_scores.append(score[sybil_id])
 

@@ -9,11 +9,11 @@ from node import Node, Sybil, Malicious
 class Model(object):
     def __init__(self, count, m_count):
         self.counts = count
-        self.sybils = Sybil(m_count)
-        self.normals = Node()
+        self.sybils = []
+        self.normals = []
         self.graph = []
         self.score = []
-        self.reveal_times = []
+        self.reveal_times = {}
         # Will be reconstruct later
         self.round = 2 * int(math.log(count, 2))
         print("Rounds:", self.round)
@@ -38,13 +38,10 @@ class Model(object):
         for k in range(0, len(listeners), 2):
             if k + 1 == len(listeners):
                 break
-            if (self.sybils.is_this_type(listeners[k]) or self.sybils.malicious.is_this_type(listeners[k])) and \
-                    (self.sybils.is_this_type(listeners[k + 1]) or self.sybils.malicious.is_this_type(listeners[k + 1])):
+            if listeners[k] in self.sybils and listeners[k + 1] in self.sybils:
                 for l in senders:
                     if l in self.normals:
                         self.score[l] = self.score[l] + 1
-                        self.sybils.add_score(listeners[k], l)
-                        self.sybils.add_score(listeners[k+1], l)
             pass
 
     def _report_sybils(self, sybil_id, listeners, senders, reveal_times=1):
@@ -91,18 +88,19 @@ class Model(object):
         nodelist = list(range(self.counts))
         self.sybils.clear()
         self.normals.clear()
+        self.reveal_times = {}
         self.graph = np.zeros((self.counts, self.round), dtype=int).tolist()
         self.score = np.zeros(self.counts, dtype=int).tolist()
         sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
         for i in sybils:
-            self.sybils.add_node(i)
+            self.sybils.append(i)
         for i in nodelist:
-            if self.sybils.is_this_type(i):
+            if i in self.sybils:
                 continue
-            self.normals.add_node(i)
-        self.sybils.select_malicious()
-        print("Normals:", self.normals.nodelist)
-        print("Sybils:", self.sybils.nodelist)
+            self.normals.append(i)
+        self.reveal_times[self.sybils[0]] = 0
+        print("Normals:", self.normals)
+        print("Sybils:", self.sybils)
         pass
 
 
@@ -134,7 +132,7 @@ def plot_both(normal, sybils):
 
 
 number_of_nodes = 16
-sybil_percent = 0.33
+sybil_percent = 0.4
 m_count = 1
 reveal_times = 5
 normal_scores = []
@@ -145,8 +143,8 @@ if __name__ == '__main__':
 
     for i in range(1000):
         model.shuffle()
-        sybil_id = model.sybils.nodelist[0]
-        normal_id = model.normals.nodelist[0]
+        sybil_id = model.sybils[0]
+        normal_id = model.normals[0]
         model.iteration(0, 0, number_of_nodes)
         model.report()
         # print(node.graph)
