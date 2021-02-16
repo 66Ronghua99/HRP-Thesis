@@ -1,5 +1,7 @@
 import random
 
+all_broadcast = 0
+
 
 class Node(object):
     def __init__(self):
@@ -46,13 +48,15 @@ class Sybil(Node):
         self.malicious = Malicious(malicious)
 
     def select_victim(self, senders):
+        global all_broadcast
         nodes = []
         for node in senders:
             if node in self.nodelist:
                 nodes.append(node)
-        if len(nodes) == len(self.nodelist) + len(self.malicious.nodelist):
-            return []
         vacant = self.malicious.malicious_condition(senders)
+        if len(nodes) == len(self.nodelist) and vacant == 0:
+            all_broadcast = all_broadcast + 1
+            return random.sample(nodes, len(nodes) - 1)
         if len(nodes) - 1 > vacant:
             return random.sample(nodes, len(nodes) - vacant)
         return []
@@ -64,10 +68,10 @@ class Malicious(Node):
         self.nodelist = list
 
     def malicious_condition(self, senders):
-        vacant = 0
+        vacant = len(self.nodelist)
         for node in self.nodelist:
             if node in senders:
-                vacant = vacant + 1
+                vacant = vacant - 1
         return vacant
 
 
