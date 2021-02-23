@@ -204,8 +204,8 @@ def plot_both(normal, sybils):
     plt.show()
 
 
-number_of_nodes = 16
-sybil_percent = 0.3
+number_of_nodes = 24
+sybil_percent = 0.45
 node_selected = 2000
 m_count = 1
 normal_scores = []
