@@ -6,9 +6,10 @@
 #include <stdbool.h>
 #include <fcntl.h>
 
-#define LOG_TAG "MagiskDetect"
+#define LOG_TAG "DetectMagiskNative"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 
+static bool isLibLoaded = false;
 static inline bool isMountPathDetected();
 static inline bool isSuPathDetected();
 
@@ -35,6 +36,11 @@ static const char *suPaths[] = {
         "/data/su",
         "/dev/su"
 };
+
+JNIEXPORT void JNICALL
+Java_com_ronghua_deviceselfcheck_Native_isLibLoaded(JNIEnv *env, jclass clazz) {
+    isLibLoaded = true;
+}
 
 
 JNIEXPORT jboolean Java_com_ronghua_deviceselfcheck_Native_detectMagiskNative(

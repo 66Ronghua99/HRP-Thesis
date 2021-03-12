@@ -5,5 +5,7 @@ public class Native {
         System.loadLibrary("native-lib");
     }
 
+    public static native void isLibLoaded();
+
     public static native boolean detectMagiskNative();
 }

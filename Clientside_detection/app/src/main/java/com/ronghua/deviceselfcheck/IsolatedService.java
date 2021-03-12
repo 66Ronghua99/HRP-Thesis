@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -15,10 +16,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class IsolatedService extends Service {
-    public static String[] blackListMountPaths = {"/sbin/.magisk/",
+    private static String[] blackListMountPaths = {"/sbin/.magisk/",
             "/sbin/.core/mirror",
             "/sbin/.core/img",
             "/sbin/.core/db-0/magisk.db"};
+    private static String TAG = "DetectMagisk";
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -28,6 +30,12 @@ public class IsolatedService extends Service {
     private IBinder mBinder = new IIsolatedProcess.Stub() {
         @Override
         public boolean detectMagiskHide() throws RemoteException {
+            try{
+                Native.isLibLoaded();
+            }catch(UnsatisfiedLinkError e){
+                Log.i(TAG, "Native lib is not loaded successfully");
+                return true;
+            }
             boolean isMagiskDetect = false;
             int count = 0;
             try {
@@ -42,7 +50,7 @@ public class IsolatedService extends Service {
                         }
                     }
                 }
-                if(count < 0)
+                if(count > 0)
                     isMagiskDetect = true;
                 else{
                     isMagiskDetect = Native.detectMagiskNative();
