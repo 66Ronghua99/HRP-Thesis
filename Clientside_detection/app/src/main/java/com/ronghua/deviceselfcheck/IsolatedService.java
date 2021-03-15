@@ -44,8 +44,10 @@ public class IsolatedService extends Service {
                 String line = "";
                 while((line = br.readLine()) != null){
                     for(String path:blackListMountPaths){
+                        Log.i(TAG, "Checking mount path: " + path);
                         if(line.contains(path)){
                             count++;
+                            Log.i(TAG, "Magisk path detected: " + path);
                             break;
                         }
                     }
