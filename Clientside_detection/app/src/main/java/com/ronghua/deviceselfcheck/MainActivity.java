@@ -27,10 +27,10 @@ import java.security.Permission;
 
 public class MainActivity extends AppCompatActivity {
 
-    private IIsolatedProcess mServiceBinder;
     private boolean isBound = false;
     private static String TAG = "DetectMagisk";
     private IBinder mRemote;
+    private RootDetection checker;
 
     public Context applicationContext(){
         return getApplicationContext();
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isBound){
                     try {
-                        boolean bRet = mServiceBinder.detectMagiskHide();
+                        boolean bRet = checker.detectMagiskHide();
                         if(bRet)
                             Toast.makeText(getApplicationContext(), "Magisk is found!", Toast.LENGTH_LONG).show();
                         else
@@ -89,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
         rootDetect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RootDetection rd = new RootDetection(getApplicationContext());
-                if(rd.isRooted()){
+                if(checker.isRooted()){
                     Toast.makeText(getApplicationContext(), "Device is rooted", Toast.LENGTH_LONG).show();
                 }else{
                     Toast.makeText(getApplicationContext(), "Device is not rooted", Toast.LENGTH_LONG).show();
@@ -111,7 +110,8 @@ public class MainActivity extends AppCompatActivity {
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mServiceBinder = IIsolatedProcess.Stub.asInterface(service);
+            IIsolatedProcess mServiceBinder = IIsolatedProcess.Stub.asInterface(service);
+            checker = new RootDetection(getApplicationContext(), mServiceBinder);
             mRemote = service;
             isBound = true;
             Log.i(TAG, "service is bound");
@@ -119,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mServiceBinder = null;
             isBound = false;
         }
     };
