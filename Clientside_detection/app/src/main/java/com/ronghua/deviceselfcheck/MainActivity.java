@@ -89,11 +89,7 @@ public class MainActivity extends AppCompatActivity {
         rootDetect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checker.isRooted()){
-                    Toast.makeText(getApplicationContext(), "Device is rooted", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Device is not rooted", Toast.LENGTH_LONG).show();
-                }
+                checker.isRooted();
             }
         });
 

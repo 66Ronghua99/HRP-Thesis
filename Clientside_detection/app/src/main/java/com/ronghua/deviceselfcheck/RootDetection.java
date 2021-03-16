@@ -3,8 +3,12 @@ package com.ronghua.deviceselfcheck;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,16 +23,44 @@ public class RootDetection {
     public static String TAG = "RootDetection";
     private Context mContext;
     private IIsolatedProcess service;
-
+    private static HandlerThread handlerThread;
+    private static Handler handler;
 
     public RootDetection(Context context, IIsolatedProcess service){
         this.mContext = context;
         this.service = service;
+        if(handlerThread == null)
+            initThread();
     }
 
-    public boolean isRooted(){
+    private void initThread(){
+        handlerThread = new HandlerThread("selfcheck-bg");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+    }
+
+    public void isRooted(){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    boolean isRooted = checkRooted();
+                    if(isRooted){
+                        Toast.makeText(mContext, "Device is rooted", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(mContext, "Device is not rooted", Toast.LENGTH_LONG).show();
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private boolean checkRooted() throws RemoteException {
         return isSuExists()||suFileDetection()||buildTagDetection()||mountPathsDetection()
-                ||rootAppDetection()||dangerousAppDetection()||rootCloakingAppDetection();
+                ||rootAppDetection()||dangerousAppDetection()||rootCloakingAppDetection()
+                ||detectMagiskHide();
     }
 
     public boolean rootAppDetection(){
@@ -94,10 +126,10 @@ public class RootDetection {
         boolean isSuDetected = false;
         String[] suPaths = Const.getPaths();
         for(String path: suPaths) {
-            Log.i(TAG, "file: " + path + filename);
             File file = new File(path, filename);
             if(file.exists()){
                 isSuDetected = true;
+                Log.i(TAG, "file detected: " + path + filename);
                 break;
             }
         }
@@ -108,7 +140,7 @@ public class RootDetection {
         boolean isSuExist = false;
         Process p = null;
         try {
-            p = Runtime.getRuntime().exec("which su");
+            p = Runtime.getRuntime().exec("which su\n");
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line = br.readLine();
             if(line != null){
