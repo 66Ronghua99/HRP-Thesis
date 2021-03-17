@@ -1,4 +1,4 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.deviceselfcheck.Utils;
 
 import android.util.Log;
 
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Const {
+    public final static int READ_PHONE_STATE = 1;
+
     public static final String[] knownRootAppsPackages = {
             "com.noshufou.android.su",
             "com.noshufou.android.su.elite",

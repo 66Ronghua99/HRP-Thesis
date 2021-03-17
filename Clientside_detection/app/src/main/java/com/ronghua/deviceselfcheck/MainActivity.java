@@ -1,20 +1,27 @@
 package com.ronghua.deviceselfcheck;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.ronghua.deviceselfcheck.Utils.Const;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,16 +39,15 @@ public class MainActivity extends AppCompatActivity {
     private IBinder mRemote;
     private RootDetection checker;
 
-    public Context applicationContext(){
-        return getApplicationContext();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button detectMagisk = findViewById(R.id.magisk);
         Button rootDetect = findViewById(R.id.rootDetection);
+        if(!(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, Const.READ_PHONE_STATE);
+        }
         detectMagisk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,26 +69,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.sometest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                android.os.Parcel _data = android.os.Parcel.obtain();
-                android.os.Parcel _reply = android.os.Parcel.obtain();
-                try {
-                    try {
-                        _data.writeInterfaceToken("com.ronghua.deviceselfcheck.IIsolatedProcess");
-                        boolean _status = mRemote.transact(IIsolatedProcess.Stub.TRANSACTION_detectMagiskHide, _data, _reply, 0);
-                        _reply.readException();
-                        boolean bRet = (0 != _reply.readInt());
-                        if(bRet)
-                            Toast.makeText(getApplicationContext(), "Magisk is found!", Toast.LENGTH_LONG).show();
-                        else
-                            Toast.makeText(getApplicationContext(), "Magisk is not found", Toast.LENGTH_LONG).show();
-                    } finally {
-                        _reply.recycle();
-                        _data.recycle();
-                    }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-
+                detectEmulator();
             }
         });
 
@@ -92,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 checker.isRooted();
             }
         });
-
 
     }
 
@@ -120,4 +106,20 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case Const.READ_PHONE_STATE:
+                if(grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    Toast.makeText(getApplicationContext(), "Please get the permission then continue!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+        }
+    }
+
+    private void detectEmulator(){
+        new EmulatorDetection(getApplicationContext())
+                .detect();
+    }
 }
