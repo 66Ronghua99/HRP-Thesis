@@ -88,7 +88,7 @@ public class RootDetection {
             while((line = br.readLine()) != null){
                 String[] args = line.split(" ");
                 for(String path:Const.pathsThatShouldNotBeWritable){
-                    if(args[1].contains(path) && args[3].equals("rw")){
+                    if(args[1].contains(path) && args[3].split(",")[0].equals("rw")){
                         return true;
                     }
                 }
