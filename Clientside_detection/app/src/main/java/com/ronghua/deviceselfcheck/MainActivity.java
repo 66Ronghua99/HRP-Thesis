@@ -43,12 +43,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button detectMagisk = findViewById(R.id.magisk);
-        Button rootDetect = findViewById(R.id.rootDetection);
         if(!(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)){
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, Const.READ_PHONE_STATE);
         }
-        detectMagisk.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.magisk).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isBound){
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rootDetect.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.rootDetection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checker.isRooted();
@@ -93,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             IIsolatedProcess mServiceBinder = IIsolatedProcess.Stub.asInterface(service);
-            checker = new RootDetection(getApplicationContext(), mServiceBinder);
+            checker = RootDetection.getInstance(getApplicationContext(), mServiceBinder);
             mRemote = service;
             isBound = true;
             Log.i(TAG, "service is bound");

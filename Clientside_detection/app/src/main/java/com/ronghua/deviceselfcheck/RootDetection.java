@@ -1,10 +1,13 @@
 package com.ronghua.deviceselfcheck;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.RemoteException;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,15 +19,34 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class RootDetection {
+    @SuppressLint("StaticFieldLeak") //This is an application Context
+    private static RootDetection instance;
     public static String TAG = "RootDetection";
     private Context mContext;
     private IIsolatedProcess service;
-    private static HandlerThread handlerThread;
-    private static Handler handler;
+    private HandlerThread handlerThread;
+    private Handler handler;
+    private ArrayList<String> rootTraitsList = new ArrayList<>();
 
-    public RootDetection(Context context, IIsolatedProcess service){
+    public ArrayList<String> getRootTraitsList() {
+        return rootTraitsList;
+    }
+
+    public static RootDetection getInstance(Context context, IIsolatedProcess service){
+        if(instance == null){
+            instance = new RootDetection(context, service);
+        }
+        return getInstance();
+    }
+
+    public static RootDetection getInstance(){
+        return instance;
+    }
+
+    private RootDetection(Context context, IIsolatedProcess service){
         this.mContext = context;
         this.service = service;
         if(handlerThread == null)
@@ -42,12 +64,15 @@ public class RootDetection {
             @Override
             public void run() {
                 try {
+                    rootTraitsList.clear();
                     boolean isRooted = checkRooted();
                     if(isRooted){
                         Toast.makeText(mContext, "Device is rooted", Toast.LENGTH_LONG).show();
                     }else{
                         Toast.makeText(mContext, "Device is not rooted", Toast.LENGTH_LONG).show();
                     }
+                    Intent intent = new Intent(mContext, DetectResultActivity.class);
+                    mContext.startActivity(intent);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -56,9 +81,15 @@ public class RootDetection {
     }
 
     private boolean checkRooted() throws RemoteException {
-        return isSuExists()||suFileDetection()||buildTagDetection()||mountPathsDetection()
-                ||rootAppDetection()||dangerousAppDetection()||rootCloakingAppDetection()
-                ||detectMagiskHide();
+        boolean result = isSuExists();
+                result |= suFileDetection();
+                result |= buildTagDetection();
+                result |= mountPathsDetection();
+                result |= rootAppDetection();
+                result |= dangerousAppDetection();
+                result |= rootCloakingAppDetection();
+                result |= detectMagiskHide();
+        return result;
     }
 
     public boolean rootAppDetection(){
@@ -76,7 +107,11 @@ public class RootDetection {
     public boolean buildTagDetection(){
         String buildTags = android.os.Build.TAGS;
         Log.i(TAG, "Build tags: "+ buildTags);
-        return buildTags != null && buildTags.contains("test-keys");
+        if(buildTags != null && buildTags.contains("test-keys")){
+            rootTraitsList.add("BuildTags contain: test-keys");
+            return true;
+        }
+        return false;
     }
 
     //Haven't considered SDK version difference
@@ -89,6 +124,7 @@ public class RootDetection {
                 String[] args = line.split(" ");
                 for(String path:Const.pathsThatShouldNotBeWritable){
                     if(args[1].contains(path) && args[3].split(",")[0].equals("rw")){
+                        rootTraitsList.add("Mounted Path '" + args[1] + "' is detected writable");
                         return true;
                     }
                 }
@@ -107,6 +143,7 @@ public class RootDetection {
             try {
                 pm.getPackageInfo(pkg, 0);
                 Log.i(TAG, "Root related app "+ pkg + " is detected!");
+                rootTraitsList.add("Root related app '" + pkg + "' is detected");
                 return true;
             } catch (PackageManager.NameNotFoundException e) {
                 //Do nothing
@@ -128,6 +165,7 @@ public class RootDetection {
             if(file.exists()){
                 isSuDetected = true;
                 Log.i(TAG, "file detected: " + path + filename);
+                rootTraitsList.add(filename + " file detected in path: " + path);
                 break;
             }
         }
@@ -143,6 +181,7 @@ public class RootDetection {
             String line = br.readLine();
             if(line != null){
                 isSuExist = true;
+                rootTraitsList.add("'which su' finds su file in path: " + line);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -154,6 +193,10 @@ public class RootDetection {
     }
 
     public boolean detectMagiskHide() throws RemoteException {
-            return service.detectMagiskHide();
+            boolean result = service.detectMagiskHide();
+            if(result){
+                rootTraitsList.add("Magisk is detected with MagiskHide detection");
+            }
+            return result;
     }
 }
