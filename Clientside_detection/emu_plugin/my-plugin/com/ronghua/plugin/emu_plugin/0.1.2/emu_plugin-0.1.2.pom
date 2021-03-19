@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.ronghua.plugin</groupId>
   <artifactId>emu_plugin</artifactId>
-  <version>0.1</version>
+  <version>0.1.2</version>
   <dependencies>
     <dependency>
       <groupId>com.android.tools.build</groupId>

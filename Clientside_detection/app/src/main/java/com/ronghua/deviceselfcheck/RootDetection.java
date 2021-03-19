@@ -72,6 +72,7 @@ public class RootDetection {
                         Toast.makeText(mContext, "Device is not rooted", Toast.LENGTH_LONG).show();
                     }
                     Intent intent = new Intent(mContext, DetectResultActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     mContext.startActivity(intent);
                 } catch (RemoteException e) {
                     e.printStackTrace();
