@@ -46,6 +46,15 @@ public class MainActivity extends AppCompatActivity {
         if(!(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)){
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, Const.READ_PHONE_STATE);
         }
+        if((getApplicationContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE)
+                != PackageManager.PERMISSION_GRANTED) ||
+                (getApplicationContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE)
+                != PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE}, Const.WIFI_STATE);
+        }
+        if(!(getApplicationContext().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        }
         findViewById(R.id.magisk).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
                 checker.isRooted();
             }
         });
+
+        findViewById(R.id.wifi).setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               HardwareExamination.getInstance(getApplicationContext()).scanWifi();
+           }
+       });
 
     }
 
@@ -110,6 +126,11 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode){
             case Const.READ_PHONE_STATE:
                 if(grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    Toast.makeText(getApplicationContext(), "Please get the permission then continue!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            case Const.WIFI_STATE:
+                if(grantResults[0] == PackageManager.PERMISSION_DENIED || grantResults[1] == PackageManager.PERMISSION_DENIED){
                     Toast.makeText(getApplicationContext(), "Please get the permission then continue!", Toast.LENGTH_SHORT).show();
                     finish();
                 }

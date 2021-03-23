@@ -15,7 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class DetectResultActivity extends AppCompatActivity {
     List<String> adapterList;
@@ -26,12 +29,18 @@ public class DetectResultActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.list_view);
         Intent intent = getIntent();
         String from = intent.getStringExtra("com.ronghua.deviceselfcheck");
-        if (from.equals("root")){
+        if( from.equals("root")) {
             RootDetection rd = RootDetection.getInstance();
             adapterList = rd.getRootTraitsList();
-        }else{
+        }else if(from.equals("emulator")) {
             EmulatorDetector ed = EmulatorDetector.with(this);
             adapterList = ed.getmResultList();
+        }else if(from.equals("wifi")) {
+            HardwareExamination he = HardwareExamination.getInstance(this);
+            adapterList = he.getWiFiDetection().getmWifiList();
+            Set<String> set = new HashSet<>();
+        }else{
+            adapterList = new ArrayList<>();
         }
         Log.i("RootDetect", adapterList.toString());
         SomeAdapter adapter = new SomeAdapter();

@@ -10,8 +10,8 @@
         android:id="@+id/magisk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginStart="124dp"
+        android:layout_marginTop="36dp"
         android:text="DetectMagisk"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,8 +20,8 @@
         android:id="@+id/rootDetection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="132dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginStart="140dp"
+        android:layout_marginTop="48dp"
         android:text="Root"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/magisk" />
@@ -30,9 +30,19 @@
         android:id="@+id/sometest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="124dp"
-        android:layout_marginTop="96dp"
+        android:layout_marginStart="132dp"
+        android:layout_marginTop="40dp"
         android:text="Emulator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rootDetection" />
+
+    <Button
+        android:id="@+id/wifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="132dp"
+        android:layout_marginTop="40dp"
+        android:text="WIFIlist"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sometest" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 public class Const {
     public final static int READ_PHONE_STATE = 1;
+    public final static int WIFI_STATE = 2;
 
     public static final String[] knownRootAppsPackages = {
             "com.noshufou.android.su",
