@@ -10,7 +10,7 @@ dependencies {
 //group和version在后面使用自定义插件的时候会用到
 
 group='com.ronghua.plugin' //本地发布的时候的组名
-version='0.1' //本地发布的版本号
+version='0.1.2' //本地发布的版本号
 
 uploadArchives {
     repositories {
