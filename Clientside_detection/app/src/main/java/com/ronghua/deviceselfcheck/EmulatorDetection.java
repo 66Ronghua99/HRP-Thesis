@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.framgia.android.emulator.EmulatorDetector;
+import com.ronghua.deviceselfcheck.EmulatorDetector;
 
 public class EmulatorDetection {
     private Context mContext;
