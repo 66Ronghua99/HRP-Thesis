@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,16 +15,24 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DetectResultActivity extends AppCompatActivity {
-    ArrayList<String> adapterList;
+    List<String> adapterList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detect_result);
         ListView listView = findViewById(R.id.list_view);
-        RootDetection rd = RootDetection.getInstance();
-        adapterList = rd.getRootTraitsList();
+        Intent intent = getIntent();
+        String from = intent.getStringExtra("com.ronghua.deviceselfcheck");
+        if (from.equals("root")){
+            RootDetection rd = RootDetection.getInstance();
+            adapterList = rd.getRootTraitsList();
+        }else{
+            EmulatorDetector ed = EmulatorDetector.with(this);
+            adapterList = ed.getmResultList();
+        }
         Log.i("RootDetect", adapterList.toString());
         SomeAdapter adapter = new SomeAdapter();
         listView.setAdapter(adapter);

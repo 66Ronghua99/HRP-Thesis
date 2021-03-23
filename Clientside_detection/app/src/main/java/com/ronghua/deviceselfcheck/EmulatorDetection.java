@@ -2,6 +2,7 @@ package com.ronghua.deviceselfcheck;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -36,6 +37,10 @@ public class EmulatorDetection {
                                     Toast.makeText(mContext, "This is an Emulator", Toast.LENGTH_LONG).show();
                                 else
                                     Toast.makeText(mContext, "This is not an Emulator", Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(mContext, DetectResultActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.putExtra("com.ronghua.deviceselfcheck", "emulator");
+                                mContext.startActivity(intent);
                             }
                         });
                     }

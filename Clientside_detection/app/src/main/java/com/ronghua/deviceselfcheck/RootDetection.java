@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RootDetection {
     @SuppressLint("StaticFieldLeak") //This is an application Context
@@ -29,9 +30,9 @@ public class RootDetection {
     private IIsolatedProcess service;
     private HandlerThread handlerThread;
     private Handler handler;
-    private ArrayList<String> rootTraitsList = new ArrayList<>();
+    private List<String> rootTraitsList = new ArrayList<>();
 
-    public ArrayList<String> getRootTraitsList() {
+    public List<String> getRootTraitsList() {
         return rootTraitsList;
     }
 
@@ -73,6 +74,7 @@ public class RootDetection {
                     }
                     Intent intent = new Intent(mContext, DetectResultActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("com.ronghua.deviceselfcheck", "root");
                     mContext.startActivity(intent);
                 } catch (RemoteException e) {
                     e.printStackTrace();

@@ -188,6 +188,14 @@ public final class EmulatorDetector {
         return this.mListPackageName;
     }
 
+    public List<String> getmResultList() {
+        return mResultList;
+    }
+
+    public void setmResultList(List<String> mResultList) {
+        this.mResultList = mResultList;
+    }
+
     public void detect(final OnEmulatorDetectorListener pOnEmulatorDetectorListener) {
         new Thread(new Runnable() {
             @Override
@@ -203,7 +211,7 @@ public final class EmulatorDetector {
 
     private boolean detect() {
         boolean result = false;
-
+        mResultList.clear();
         log(getDeviceInfo());
 
         // Check Basic
@@ -246,6 +254,41 @@ public final class EmulatorDetector {
                 || Build.PRODUCT.toLowerCase().contains("nox")
                 || Build.SERIAL.toLowerCase().contains("nox");
 
+        if(Build.FINGERPRINT.startsWith("generic"))
+            mResultList.add("Build FINGERPRINT startsWith generic");
+        if(Build.MODEL.contains("google_sdk"))
+            mResultList.add("Build MODEL contains google_sdk");
+        if(Build.MODEL.toLowerCase().contains("droid4x"))
+            mResultList.add("Build MODEL contains droid4x");
+        if(Build.MODEL.contains("Emulator"))
+            mResultList.add("Build MODEL contains Emulator");
+        if(Build.MODEL.contains("Android SDK built for x86"))
+            mResultList.add("Build MODEL contains Android SDK built for x86");
+        if(Build.MANUFACTURER.contains("Genymotion"))
+            mResultList.add("Build MANUFACTURER contains Genymotion");
+        if(Build.HARDWARE.equals("goldfish"))
+            mResultList.add("Build HARDWARE equals goldfish");
+        if(Build.HARDWARE.equals("vbox86"))
+            mResultList.add("Build HARDWARE equals vbox86");
+        if(Build.PRODUCT.equals("sdk"))
+            mResultList.add("Build PRODUCT equals sdk");
+        if(Build.PRODUCT.equals("google_sdk"))
+            mResultList.add("Build PRODUCT equals google_sdk");
+        if(Build.PRODUCT.equals("sdk_x86"))
+            mResultList.add("Build PRODUCT equals sdk_x86");
+        if(Build.PRODUCT.equals("vbox86p"))
+            mResultList.add("Build PRODUCT equals vbox86p");
+        if(Build.BOARD.toLowerCase().contains("nox"))
+            mResultList.add("Build BOARD contains nox");
+        if(Build.BOOTLOADER.toLowerCase().contains("nox"))
+            mResultList.add("Build BOOTLOADER contains nox");
+        if(Build.HARDWARE.toLowerCase().contains("nox"))
+            mResultList.add("Build HARDWARE contains nox");
+        if(Build.PRODUCT.toLowerCase().contains("nox"))
+            mResultList.add("Build PRODUCT contains nox");
+        if(Build.SERIAL.toLowerCase().contains("nox"))
+            mResultList.add("Build SERIAL contains nox");
+
         if (result) return true;
         result |= Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic");
         if (result) return true;
@@ -254,14 +297,14 @@ public final class EmulatorDetector {
     }
 
     private boolean checkAdvanced() {
-        boolean result = checkTelephony()
-                || checkFiles(GENY_FILES, "Geny")
-                || checkFiles(ANDY_FILES, "Andy")
-                || checkFiles(NOX_FILES, "Nox")
-                || checkQEmuDrivers()
-                || checkFiles(PIPES, "Pipes")
-                || checkIp()
-                || (checkQEmuProps() && checkFiles(X86_FILES, "X86"));
+        boolean result = checkTelephony();
+                result |= checkFiles(GENY_FILES, "Geny");
+                result |= checkFiles(ANDY_FILES, "Andy");
+                result |= checkFiles(NOX_FILES, "Nox");
+                result |= checkQEmuDrivers();
+                result |= checkFiles(PIPES, "Pipes");
+                result |= checkIp();
+                result |= (checkQEmuProps() && checkFiles(X86_FILES, "X86"));
         return result;
     }
 
@@ -375,6 +418,7 @@ public final class EmulatorDetector {
                 for (String known_qemu_driver : QEMU_DRIVERS) {
                     if (driver_data.contains(known_qemu_driver)) {
                         log("Check QEmuDrivers is detected");
+                        mResultList.add("QemuDrivers is detected!");
                         return true;
                     }
                 }
@@ -389,6 +433,7 @@ public final class EmulatorDetector {
             File qemu_file = new File(pipe);
             if (qemu_file.exists()) {
                 log("Check " + type + " is detected");
+                mResultList.add("Check file of type " + type + "is detected!");
                 return true;
             }
         }
@@ -412,6 +457,7 @@ public final class EmulatorDetector {
 
         if (found_props >= MIN_PROPERTIES_THRESHOLD) {
             log("Check QEmuProps is detected");
+            mResultList.add("QemuProps is detected!");
             return true;
         }
         return false;
@@ -451,6 +497,7 @@ public final class EmulatorDetector {
                             && lan.contains(IP)) {
                         ipDetected = true;
                         log("Check IP is detected");
+                        mResultList.add("Emulator Ip of " + IP +" is detected");
                         break;
                     }
                 }
