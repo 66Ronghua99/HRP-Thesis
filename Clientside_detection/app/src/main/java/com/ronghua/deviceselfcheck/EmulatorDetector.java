@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,8 +83,11 @@ public final class EmulatorDetector {
             "x86.prop",
             "ueventd.ttVM_x86.rc",
             "init.ttVM_x86.rc",
+            "init.android_x86.rc",
             "fstab.ttVM_x86",
             "fstab.vbox86",
+            "fstab.android_x86",
+            "fstab_sdcard.android_x86",
             "init.vbox86.rc",
             "ueventd.vbox86.rc"
     };
@@ -304,7 +308,7 @@ public final class EmulatorDetector {
                 result |= checkQEmuDrivers();
                 result |= checkFiles(PIPES, "Pipes");
                 result |= checkIp();
-                result |= (checkQEmuProps() && checkFiles(X86_FILES, "X86"));
+                result |= checkFiles(X86_FILES, "X86")&&checkQEmuProps();
         return result;
     }
 
@@ -429,15 +433,18 @@ public final class EmulatorDetector {
     }
 
     private boolean checkFiles(String[] targets, String type) {
+        boolean result = false;
         for (String pipe : targets) {
-            File qemu_file = new File(pipe);
-            if (qemu_file.exists()) {
+            String[] path = getPath(pipe);
+            File qemu_file = new File(path[0], path[1]);
+            if (qemu_file.getAbsoluteFile().exists()) {
                 log("Check " + type + " is detected");
-                mResultList.add("Check file of type " + type + "is detected!");
-                return true;
+                mResultList.add("Check file of type " + type + " is detected!");
+                result = true;
             }
         }
-        return false;
+
+        return result;
     }
 
     private boolean checkQEmuProps() {
@@ -445,18 +452,19 @@ public final class EmulatorDetector {
 
         for (Property property : PROPERTIES) {
             String property_value = getProp(mContext, property.name);
-            if ((property.seek_value == null) && (property_value != null)) {
+            if ((property.seek_value == null) && (property_value != null) && !(property_value.equals(""))) {
+                log("Qemu Property value: " + property_value);
                 found_props++;
             }
             if ((property.seek_value != null)
                     && (property_value.contains(property.seek_value))) {
+                log("Qemu Property value: " + property_value);
                 found_props++;
             }
 
         }
 
         if (found_props >= MIN_PROPERTIES_THRESHOLD) {
-            log("Check QEmuProps is detected");
             mResultList.add("QemuProps is detected!");
             return true;
         }
@@ -546,4 +554,14 @@ public final class EmulatorDetector {
                 "Build.HARDWARE: " + Build.HARDWARE + "\n" +
                 "Build.FINGERPRINT: " + Build.FINGERPRINT;
     }
+
+    private String[] getPath(String path){
+        int index = path.lastIndexOf("/") + 1;
+        if(index == 0){
+            return new String[]{"/", path};
+        }else {
+            return new String[]{path.substring(0, index), path.substring(index)};
+        }
+    }
+
 }

@@ -32,13 +32,16 @@ public class DetectResultActivity extends AppCompatActivity {
         if( from.equals("root")) {
             RootDetection rd = RootDetection.getInstance();
             adapterList = rd.getRootTraitsList();
+            Log.i("RootDetect", "!!!!");
         }else if(from.equals("emulator")) {
             EmulatorDetector ed = EmulatorDetector.with(this);
             adapterList = ed.getmResultList();
+            Log.i("RootDetect", "####");
         }else if(from.equals("wifi")) {
             HardwareExamination he = HardwareExamination.getInstance(this);
             adapterList = he.getWiFiDetection().getmWifiList();
             Set<String> set = new HashSet<>();
+            Log.i("RootDetect", "ccccc");
         }else{
             adapterList = new ArrayList<>();
         }
