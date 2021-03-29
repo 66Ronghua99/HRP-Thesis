@@ -148,7 +148,6 @@ class Model(object):
                 return False
         return True
 
-
     def judgement(self):
         pass
 
@@ -184,7 +183,7 @@ def plot_scores(scores, color='b', bar_width=0.0, name_label='normal'):
             mark = score
             labels.append(mark)
             label_score.append(1)
-    label_score = [float(x)*100/total for x in label_score]
+    label_score = [float(x) * 100 / total for x in label_score]
     plt.bar(labels, label_score, alpha=0.7, color=color, width=0.5, label=name_label, tick_label=labels)
     # plt.show()
     return plt
@@ -204,8 +203,21 @@ def plot_both(normal, sybils):
     plt.show()
 
 
-number_of_nodes = 24
-sybil_percent = 0.45
+def print_average(normal, sybils):
+    pass
+    total = 0
+    for s in normal:
+        total = total + s
+    avg = float(total / node_selected)
+    total1 = 0
+    for s in sybils:
+        total1 = total1 + s
+    avg1 = float(total1 / node_selected)
+    print("normals:", avg, "sybils: ", avg1)
+
+
+number_of_nodes = 16
+sybil_percent = 0.4
 node_selected = 2000
 m_count = 1
 normal_scores = []
@@ -229,9 +241,10 @@ if __name__ == '__main__':
         print(node.all_broadcast)
         node.all_broadcast = 0
         print()
-    print("Wrong_case:", str(wrong_case*100/float(node_selected)) + "%")
+    print("Wrong_case:", str(wrong_case * 100 / float(node_selected)) + "%")
     normal_scores.sort()
     sybil_scores.sort()
     # plot_scores(normal_scores)
     # plot_scores(sybil_scores)
     plot_both(normal_scores, sybil_scores)
+    print_average(normal_scores, sybil_scores)
