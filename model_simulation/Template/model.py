@@ -6,30 +6,30 @@ from node import Node, Sybil, Malicious
 import node
 
 
-# 40% of the nodes are sybils
+# The simulation model
 class Model(object):
     def __init__(self, count, m_count):
         self.counts = count
-        self.sybils = Sybil(m_count)
-        self.normals = Node()
-        self.graph = []
-        self.score = []
-        self.reveal_times = []
+        self.sybils = Sybil(m_count) #init sybil object
+        self.normals = Node() #init normal nodes object
+        self.table = [] # broadcasting and listening order table
+        self.score = [] # record the score of each node
         # Will be reconstruct later
-        self.round = 2 * int(math.log(count, 2))
+        self.round = 2 * int(math.log(count, 2)) # rounds
         print("Rounds:", self.round)
         pass
 
+    # Forming the broadcasting table
     def iteration(self, rnd, beg, end):
         if end > beg + 1 and rnd < self.round:
             mid = int((beg + end) / 2)
             for i in range(beg, mid):
                 # select nodes to be listeners, and report all broadcasting normal nodes;
                 # 1 stands for broadcast 0 stands for listener
-                self.graph[i][rnd + 1] = 1
+                self.table[i][rnd + 1] = 1
                 pass
             for i in range(mid, end):
-                self.graph[i][rnd] = 1
+                self.table[i][rnd] = 1
                 pass
             self.iteration(rnd + 2, beg, mid)
             self.iteration(rnd + 2, mid, end)
@@ -62,12 +62,14 @@ class Model(object):
                     self.normals.add_score(listeners[k], listeners[k + 1], victim)
                     self.normals.add_score(listeners[k + 1], listeners[k], victim)
 
+    # Report procedure by sentries
     def report(self):
+        # go through the process, normal and Sybils report the opponents when they should
         for j in range(self.round):
             listeners = []
             senders = []
             for i in range(self.counts):
-                if self.graph[i][j] == 0:
+                if self.table[i][j] == 0:
                     listeners.append(i)
                 else:
                     senders.append(i)
@@ -85,11 +87,12 @@ class Model(object):
             pass
         return self.score
 
+    # Randomly select nodes to be Sybils or normals
     def shuffle(self):
         nodelist = list(range(self.counts))
         self.sybils.clear()
         self.normals.clear()
-        self.graph = np.zeros((self.counts, self.round), dtype=int).tolist()
+        self.table = np.zeros((self.counts, self.round), dtype=int).tolist()
         self.score = np.zeros(self.counts, dtype=int).tolist()
         sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
         for i in sybils:
@@ -104,13 +107,15 @@ class Model(object):
         print("Malicious:", self.sybils.malicious.nodelist)
         pass
 
+    # Hunt Sybils based on the score list (self.score)
     def hunt(self):
-        normal_list = list(range(number_of_nodes))
-        score_list = self.score.copy()
+        normal_list = list(range(number_of_nodes)) # Nodes remain in the list are considered normal
+        score_list = self.score.copy() # score list, the score will be set to -1 if the node is eliminated
         # TODO: if we get no score higher than threshold, do sth.....
         while True:
             node = 0
             max = 0
+            # find the node with the highest score
             for i in range(len(score_list)):
                 if score_list[i] > max:
                     max = score_list[i]
@@ -118,6 +123,7 @@ class Model(object):
             if max <= 1:
                 break
             suspect = None
+            # get the node object
             if node in self.normals.nodelist:
                 suspect = self.normals.score_dict
             elif node in self.sybils.nodelist or node in self.sybils.malicious.nodelist:
@@ -134,17 +140,16 @@ class Model(object):
                     suspect[company_id].pop(node)
             score_list[node] = -1
             normal_list.remove(node)
-        if len(normal_list) < number_of_nodes / 2:  # normals need to be the majority
-            for i in range(number_of_nodes):
+        if len(normal_list) < number_of_nodes / 2:  # This is a test. If over half of the nodes are eliminated, eliminated nodes will be selected instead.
+            for i in range(number_of_nodes): # this reverse selection is useless. Selected nodes will be half normal half Sybil.
                 if i in normal_list:
                     normal_list.remove(i)
                 else:
                     normal_list.append(i)
         print("Detection results:", normal_list, score_list, len(normal_list))
-        # TODO: statistic of wrong hunting procedure
         for x in self.normals.nodelist:
             if x not in normal_list:
-                print("something wrong")
+                print("False elimination")
                 return False
         return True
 
@@ -152,6 +157,7 @@ class Model(object):
         pass
 
 
+# This is for the tests of specific cases, not used in normal runs
 def sample_test(normals, sybils, malicious):
     model = Model(number_of_nodes, m_count)
     model.normals = Node()
@@ -162,11 +168,11 @@ def sample_test(normals, sybils, malicious):
         model.sybils.add_node(node)
     for node in malicious:
         model.sybils.score_dict[node] = {}
-    model.graph = np.zeros((model.counts, model.round), dtype=int).tolist()
+    model.table = np.zeros((model.counts, model.round), dtype=int).tolist()
     model.score = np.zeros(model.counts, dtype=int).tolist()
     model.sybils.malicious = Malicious(malicious)
     model.iteration(0, 0, number_of_nodes)
-    print(model.graph)
+    print(model.table)
     model.report()
     model.hunt()
 
@@ -218,8 +224,8 @@ def print_average(normal, sybils):
 
 number_of_nodes = 16
 sybil_percent = 0.4
-node_selected = 2000
-m_count = 1
+node_selected = 2000  # time of runs
+m_count = 1 # malicious node number
 normal_scores = []
 sybil_scores = []
 
@@ -235,7 +241,7 @@ if __name__ == '__main__':
         # print(node.graph)
         score = model.score_display()
         if not model.hunt():
-            wrong_case = wrong_case + 1
+            wrong_case = wrong_case + 1 # collecting wrong cases of elimination
         normal_scores.append(score[normal_id])
         sybil_scores.append(score[sybil_id])
         print(node.all_broadcast)
