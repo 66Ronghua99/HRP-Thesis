@@ -198,7 +198,7 @@ public class RootDetection {
     public boolean detectMagiskHide() throws RemoteException {
             boolean result = service.detectMagiskHide();
             if(result){
-                rootTraitsList.add("Magisk is detected with MagiskHide detection");
+                rootTraitsList.add("Root is detected with IsolatedProcess detection");
             }
             return result;
     }

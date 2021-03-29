@@ -121,6 +121,26 @@ public final class EmulatorDetector {
             new Property("ro.serialno", null)
     };
 
+    private final static String[] BuildTags = {
+            Build.FINGERPRINT,
+            Build.MODEL,
+            Build.MODEL,
+            Build.MODEL,
+            Build.MODEL,
+            Build.MANUFACTURER,
+            Build.HARDWARE,
+            Build.HARDWARE,
+            Build.PRODUCT,
+            Build.PRODUCT,
+            Build.PRODUCT,
+            Build.PRODUCT,
+            Build.BOARD,
+            Build.BOOTLOADER,
+            Build.HARDWARE,
+            Build.PRODUCT,
+            Build.SERIAL,
+    };
+
     private static final String IP = "10.0.2.15";
 
     private static final int MIN_PROPERTIES_THRESHOLD = 0x5;
@@ -258,6 +278,14 @@ public final class EmulatorDetector {
                 || Build.PRODUCT.toLowerCase().contains("nox")
                 || Build.SERIAL.toLowerCase().contains("nox");
 
+        for(String abi:Build.SUPPORTED_ABIS){
+            if(abi.equals("x86") || abi.contains("x86")){
+                result = true;
+                mResultList.add("CPU abiList contains x86 structure");
+                break;
+            }
+        }
+
         if(Build.FINGERPRINT.startsWith("generic"))
             mResultList.add("Build FINGERPRINT startsWith generic");
         if(Build.MODEL.contains("google_sdk"))
@@ -292,6 +320,10 @@ public final class EmulatorDetector {
             mResultList.add("Build PRODUCT contains nox");
         if(Build.SERIAL.toLowerCase().contains("nox"))
             mResultList.add("Build SERIAL contains nox");
+
+        for (String build:BuildTags){
+            Log.i("EmulatorDetect", "Buildtags: " + build);
+        }
 
         if (result) return true;
         result |= Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic");
