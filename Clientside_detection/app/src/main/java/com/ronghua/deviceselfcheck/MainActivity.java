@@ -1,20 +1,27 @@
 package com.ronghua.deviceselfcheck;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.ronghua.deviceselfcheck.Utils.Const;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,17 +39,29 @@ public class MainActivity extends AppCompatActivity {
     private IBinder mRemote;
     private RootDetection checker;
 
-    public Context applicationContext(){
-        return getApplicationContext();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button detectMagisk = findViewById(R.id.magisk);
-        Button rootDetect = findViewById(R.id.rootDetection);
-        detectMagisk.setOnClickListener(new View.OnClickListener() {
+        if(!(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)){
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, Const.READ_PHONE_STATE);
+        }
+        if((getApplicationContext().checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE)
+                != PackageManager.PERMISSION_GRANTED) ||
+                (getApplicationContext().checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE)
+                != PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE}, Const.WIFI_STATE);
+        }
+        if(!(getApplicationContext().checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        }
+        if(!(getApplicationContext().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        }
+        if(!(getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_SETTINGS) == PackageManager.PERMISSION_GRANTED)){
+            requestPermissions(new String[]{Manifest.permission.WRITE_SETTINGS}, 0);
+        }
+        findViewById(R.id.magisk).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isBound){
@@ -63,40 +82,37 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.sometest).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                android.os.Parcel _data = android.os.Parcel.obtain();
-                android.os.Parcel _reply = android.os.Parcel.obtain();
-                try {
-                    try {
-                        _data.writeInterfaceToken("com.ronghua.deviceselfcheck.IIsolatedProcess");
-                        boolean _status = mRemote.transact(IIsolatedProcess.Stub.TRANSACTION_detectMagiskHide, _data, _reply, 0);
-                        _reply.readException();
-                        boolean bRet = (0 != _reply.readInt());
-                        if(bRet)
-                            Toast.makeText(getApplicationContext(), "Magisk is found!", Toast.LENGTH_LONG).show();
-                        else
-                            Toast.makeText(getApplicationContext(), "Magisk is not found", Toast.LENGTH_LONG).show();
-                    } finally {
-                        _reply.recycle();
-                        _data.recycle();
-                    }
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-
+                detectEmulator();
             }
         });
 
-        rootDetect.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.rootDetection).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checker.isRooted()){
-                    Toast.makeText(getApplicationContext(), "Device is rooted", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Device is not rooted", Toast.LENGTH_LONG).show();
-                }
+                checker.isRooted();
             }
         });
 
+        findViewById(R.id.wifi).setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               HardwareExamination.getInstance(getApplicationContext()).scanWifi();
+           }
+       });
+
+        findViewById(R.id.hotspot).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HardwareExamination.getInstance(getApplicationContext()).enableAp();
+            }
+        });
+
+        findViewById(R.id.hotspot2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HardwareExamination.getInstance(getApplicationContext()).disableAp();
+            }
+        });
 
     }
 
@@ -111,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             IIsolatedProcess mServiceBinder = IIsolatedProcess.Stub.asInterface(service);
-            checker = new RootDetection(getApplicationContext(), mServiceBinder);
+            checker = RootDetection.getInstance(getApplicationContext(), mServiceBinder);
             mRemote = service;
             isBound = true;
             Log.i(TAG, "service is bound");
@@ -124,4 +140,20 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case Const.READ_PHONE_STATE:
+                if(grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    Toast.makeText(getApplicationContext(), "Please get the permission then continue!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+        }
+    }
+
+    private void detectEmulator(){
+        new EmulatorDetection(getApplicationContext())
+                .detect();
+    }
 }

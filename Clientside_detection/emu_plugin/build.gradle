@@ -1,0 +1,27 @@
+apply plugin: 'groovy' //这是一个groovy项目
+apply plugin: 'maven' //会用到maven plugin
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:gradle:4.0.1'  //gradle library
+    compile 'org.javassist:javassist:3.27.0-GA' //javassist的library
+}
+//group和version在后面使用自定义插件的时候会用到
+
+group='com.ronghua.plugin' //本地发布的时候的组名
+version='0.1.2' //本地发布的版本号
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //提交到远程服务器：
+            // repository(url: "http://www.xxx.com/repos") {
+            //    authentication(userName: "admin", password: "admin")
+// }
+//本地的Maven地址:当前工程下
+            repository(url: uri('./my-plugin'))
+//            repository(url: uri('C:\\Users\\RONGHUA LI\\.m2\\repository'))    //maven发布的位置
+        }
+    }
+}
