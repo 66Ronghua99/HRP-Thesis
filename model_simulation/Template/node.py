@@ -4,9 +4,10 @@ all_broadcast = 0
 
 
 class Node(object):
+    score_dict = {}
+
     def __init__(self):
         self.nodelist = [] # id of nodes
-        self.score_dict = {} # points caused by nodes would be recorded in the dict
         pass
 
     def is_this_type(self, id):
@@ -16,13 +17,13 @@ class Node(object):
 
     def add_node(self, node_id):
         self.nodelist.append(node_id)
-        if node_id not in self.score_dict:
-            self.score_dict[node_id] = {}
+        if node_id not in Node.score_dict:
+            Node.score_dict[node_id] = {}
 
     # When adding points to others, both nodes in the Sentry would add each other to score_dict. This is the record
     # for later elimination. We'll know who reports who. Add or subtract points from nodes at the stage of hunting.
     def add_score(self, node_id, company_id, score_id):
-        temp_dict = self.score_dict[node_id]
+        temp_dict = Node.score_dict[node_id]
         if company_id in temp_dict:
             temp_dict = temp_dict[company_id]
         else:
@@ -35,7 +36,7 @@ class Node(object):
 
     def clear(self):
         self.nodelist.clear()
-        self.score_dict.clear()
+        Node.score_dict.clear()
 
 
 class Sybil(Node):

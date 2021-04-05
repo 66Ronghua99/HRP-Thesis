@@ -122,12 +122,7 @@ class Model(object):
                     node = i
             if max <= 1:
                 break
-            suspect = None
-            # get the node object
-            if node in self.normals.nodelist:
-                suspect = self.normals.score_dict
-            elif node in self.sybils.nodelist or node in self.sybils.malicious.nodelist:
-                suspect = self.sybils.score_dict
+            suspect = Node.score_dict
             if suspect:
                 for company_id in suspect[node]:  # go through to find all scores ought to be subtracted
                     company_dict = suspect[node][company_id]
