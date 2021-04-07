@@ -11,7 +11,7 @@ class Server(object):
         self.rnd = 2 * int(math.log(num, 2))
         self.score_list = np.zeros(self.node_num, dtype=int).tolist()
         self.rounds = np.zeros((self.node_num, self.rnd), dtype=int).tolist()
-        self.normal_list = []
+        self.normal_list = list(range(self.node_num))
         self.rssi_list = {}
         self.cur_rnd = 0
         self.listeners = []
@@ -20,6 +20,7 @@ class Server(object):
         self.threads = []
         self.msg_queue = Queue()
         self.init_thread()
+        self.init_sertry_record()
         iteration(self.rounds, 0, 0, self.node_num)
         pass
 
@@ -35,6 +36,10 @@ class Server(object):
         td = threading.Thread(target=self.thread_loop_task)
         self.threads.append(td)
         td.start()
+
+    def init_sertry_record(self):
+        for id in range(self.node_num):
+            self.sentry_record[id] = {}
 
     def _process_finished_task(self):
         print("process finished! Score list:", self.score_list)
@@ -68,6 +73,69 @@ class Server(object):
         if len(suspects) > 0:
             self._add_record(node0, node1, suspects)
             self._add_record(node1, node0, suspects)
+
+    # thread task: hunt sybil nodes
+    def hunt(self):
+        # TODO: definitive sybil list
+        definite_s = []
+        suspect = self.sentry_record
+        while True:
+            suspect_list = []
+            # find the node with the highest score
+            highest_list = []
+            if not self._get_highest_list(highest_list):
+                break
+            if len(highest_list) > 1:
+                for node in highest_list:
+                    self._select_sybil_suspect(node, suspect, definite_s, suspect_list)
+            node = None
+            if len(suspect_list) == 0:
+                node = highest_list[0]
+            else:
+                node = suspect_list[0]
+            self.whitewash_and_punish(node, suspect, definite_s)
+        print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
+
+    def whitewash_and_punish(self, node, suspect, definite_s):
+        for company_id in suspect[node]:  # go through to find all scores ought to be subtracted
+            company_dict = suspect[node][company_id]
+            score_sum = 0
+            for node_id, node_score in company_dict.items():
+                if node_id in definite_s:
+                    continue
+                score_sum = score_sum + node_score
+                self.score_list[node_id] = self.score_list[node_id] - node_score
+            if self.score_list[company_id] >= 0:
+                self.score_list[company_id] = self.score_list[company_id] + score_sum
+            suspect[company_id].pop(node)
+        self.score_list[node] = -1
+        self.normal_list.remove(node)
+        self.score_list[node] = -1
+        if node not in definite_s:
+            definite_s.append(node)
+
+    def _select_sybil_suspect(self, node, suspect, definite_s, suspect_list):
+        for company_id in suspect[node]:  # if a node with the highest score fail to suspect a Sybil, it's eliminated
+            company_dict = suspect[node][company_id]
+            score_sum = 0
+            for node_id in definite_s:
+                if node_id in company_dict:
+                    return True
+        else:
+            suspect_list.append(node)
+        return False
+
+    def _get_highest_list(self, highest_list):
+        max_point = 0
+        for i in range(len(self.score_list)):
+            if self.score_list[i] > max_point:
+                max_point = self.score_list[i]
+        if max_point <= 0:
+            return False
+        for i in range(len(self.score_list)):
+            if self.score_list[i] == max_point:
+                highest_list.append(i)
+        return True
 
     def _add_record(self, node0, node1, suspects: dict):
         temp_dict = None
@@ -118,10 +186,11 @@ class Server(object):
 
     def process_finished(self):
         self._add_task(self._process_finished_task)
+        self._add_task(self.hunt)
 
     def reset(self):
         self.score_list.clear()
-        self.normal_list.np.zeros(self.node_num, dtype=int).tolist()
+        self.normal_list = list(range(self.node_num))
         self.rounds = np.zeros((self.counts, self.cur_rnd), dtype=int).tolist()
         self.rssi_list = {}
         self.cur_rnd = 0
@@ -150,15 +219,24 @@ class Queue:
     def __init__(self):
         self._index = 0
         self.queue = []
+        self.lock = threading.RLock()
 
     def push(self, task):
-        self.queue.append(task)
-        self._index += 1
+        self.lock.acquire()
+        try:
+            self.queue.append(task)
+            self._index += 1
+        finally:
+            self.lock.release()
 
     def pop(self):
-        if self._index == 0:
-            return
-        self._index -= 1
+        self.lock.acquire()
+        try:
+            if self._index == 0:
+                return
+            self._index -= 1
+        finally:
+            self.lock.release()
         return self.queue.pop(0)
 
     @property

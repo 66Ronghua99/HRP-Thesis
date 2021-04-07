@@ -12,7 +12,7 @@ class Model:
         self.normals = list(range(node_num))
         self.maps = Maps(20, 20)
         self.maps.init_loc(node_num)
-        self.maps.print_map()
+        # self.maps.print_map()
         self.sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
         for id in self.sybils:
             self.normals.remove(id)
@@ -44,7 +44,6 @@ class Model:
                     # Sybil receiver behavior
                     self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters)
         self.server.process_finished()
-        print("Main process exit")
 
     def _init_broadcasters(self, broadcasters):
         locations = self._b_locations(broadcasters)
