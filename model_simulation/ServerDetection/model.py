@@ -12,7 +12,7 @@ class Model:
         self.normals = list(range(node_num))
         self.maps = Maps(20, 20)
         self.maps.init_loc(node_num)
-        # self.maps.print_map()
+        self.maps.print_map()
         self.sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
         for id in self.sybils:
             self.normals.remove(id)
@@ -24,7 +24,7 @@ class Model:
             if id in self.normals:
                 self.nodes[id] = Node(1, id, self.maps.get_node_loc(id))
             else:
-                self.nodes[id] = Node(1, id, self.maps.get_node_loc(id), [0, 0], is_evil=True)
+                self.nodes[id] = Node(1, id, self.maps.get_node_loc(id), ap_loc=[0, 0], is_evil=True)
 
     def main_process(self):
         # broadcasting and receiving process
@@ -99,6 +99,7 @@ class Maps:
         self.x_min = -int(length/2)
         self.y_max = int(height/2) if height%2==0 else int(height/2 + 1)
         self.y_min = -int(height/2)
+        self.maps[self.middle_y][self.middle_x] = -1
         self.loc_map = {}
 
     def init_loc(self, node_num: int):
@@ -110,9 +111,9 @@ class Maps:
             return False
         if x==0 and y==0:
             return False
-        if self.maps[self.middle_y + y][self.middle_y + y] == 0:
-            self.maps[self.middle_y + y][self.middle_x + x] = 1
-            self.loc_map[id] = [self.middle_y + y, self.middle_y + y]
+        if self.maps[self.middle_y - y][self.middle_x + x] == 0:
+            self.maps[self.middle_y - y][self.middle_x + x] = id+1
+            self.loc_map[id] = [x, y]
             return True
         return False
 
