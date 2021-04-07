@@ -38,6 +38,7 @@ class Server(object):
 
     def _process_finished_task(self):
         print("process finished! Score list:", self.score_list)
+        print("sentry record: ", self.sentry_record)
 
     # thread adding score task
     def suspect(self, node0, node1, rssi0, rssi1, listeners, broadcasters):
@@ -67,7 +68,6 @@ class Server(object):
         if len(suspects) > 0:
             self._add_record(node0, node1, suspects)
             self._add_record(node1, node0, suspects)
-        print("Cur score list:", self.score_list)
 
     def _add_record(self, node0, node1, suspects: dict):
         temp_dict = None
