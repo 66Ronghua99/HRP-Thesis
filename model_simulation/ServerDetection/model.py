@@ -47,7 +47,6 @@ class Model:
                     # Sybil receiver behavior
                     self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters)
         self.server.process_finished()
-        self.server._add_task(exit)
         self.server.threads[0].join()
         print()
 

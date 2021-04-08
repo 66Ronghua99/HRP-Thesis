@@ -66,7 +66,6 @@ class Server(object):
             if i+1 == len(ratios):
                 break
             if math.fabs(values[i] - values[i+1]) < 0.00001:
-
                 suspects[keys[i]] = ""
                 suspects[keys[i+1]] = ""
         for id, _ in suspects.items():
@@ -81,6 +80,7 @@ class Server(object):
         # TODO: definitive sybil list
         definite_s = []
         while True:
+            self._select_definite_sybils(definite_s)
             suspect_list = []
             # find the node with the highest score
             highest_list = []
@@ -89,21 +89,27 @@ class Server(object):
             if len(highest_list) > 1:
                 for node in highest_list:
                     self._select_sybil_suspect(node, definite_s, suspect_list)
-            node = None
+            eliminate_list = None
             if len(suspect_list) == 0:
-                node = highest_list[0]
+                eliminate_list = highest_list
             else:
-                node = suspect_list[0]
-            self.whitewash_and_punish(node, definite_s)
+                eliminate_list = suspect_list
+            for node in eliminate_list:
+                if self._whitewash_and_punish(node, definite_s):
+                    break
         print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
 
-    def whitewash_and_punish(self, node, definite_s):
+    def _whitewash_and_punish(self, node, definite_s):
+        is_all_score_from_definite_sybils = True
+        has_suspect = False
         for company_id in self.sentry_record[node]:  # go through to find all scores ought to be subtracted
+            has_suspect = True
             company_dict = self.sentry_record[node][company_id]
             score_sum = 0
             for node_id, node_score in company_dict.items():
                 if node_id in definite_s:
                     continue
+                is_all_score_from_definite_sybils = False
                 score_sum = score_sum + node_score
                 self.score_list[node_id] = self.score_list[node_id] - node_score
             if self.score_list[company_id] >= 0:
@@ -111,9 +117,12 @@ class Server(object):
             self.sentry_record[company_id].pop(node)
         self.sentry_record[node].clear()
         self.score_list[node] = -1
+        if is_all_score_from_definite_sybils and node not in definite_s and has_suspect:
+            return False
         self.normal_list.remove(node)
         if node not in definite_s:
             definite_s.append(node)
+        return True
 
     def _select_sybil_suspect(self, node, definite_s, suspect_list):
         for company_id in self.sentry_record[node]:  # if a node with the highest score fail to suspect a Sybil, it's eliminated
@@ -125,6 +134,19 @@ class Server(object):
         else:
             suspect_list.append(node)
         return False
+
+    def _select_definite_sybils(self, d_s):
+        score_list = {}
+        for id in range(len(self.score_list)):
+            if self.score_list[id] < 0:
+                continue
+            score_list[id] = self.score_list[id]
+        std = np.std(list(score_list.values()))
+        mean = np.mean(list(score_list.values()))
+        threshold = mean + 1.7 * std
+        for id, score in score_list.items():
+            if score > threshold and id not in d_s:
+                d_s.append(id)
 
     def _get_highest_list(self, highest_list):
         max_point = 0
@@ -158,7 +180,7 @@ class Server(object):
         task = Task(func, args=args, kwargs=kwargs)
         self.msg_queue.push(task)
 
-    def add_score(self):
+    def _add_score(self):
         listeners = self.listeners.copy()
         while len(listeners) > 1:
             id0 = listeners[0]
@@ -171,7 +193,7 @@ class Server(object):
     def collect(self, node_id, rssi: dict):
         self.rssi_list[node_id] = list(rssi.values())
         if len(self.rssi_list) == len(self.listeners):
-            self.add_score()
+            self._add_score()
             self.rssi_list.clear()
             self.listeners.clear()
 
@@ -189,6 +211,7 @@ class Server(object):
     def process_finished(self):
         self._add_task(self._process_finished_task)
         self._add_task(self.hunt)
+        self._add_task(exit)
 
     def reset(self):
         self.score_list.clear()

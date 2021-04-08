@@ -2,6 +2,7 @@ from ServerDetection.server import Server
 from ServerDetection.utils import euclidean_d
 import json
 import ast
+import numpy as np
 
 
 def server_test():
@@ -59,9 +60,15 @@ def case_test():
     server.threads[0].join()
 
 
+def cal_std_mean(ls):
+    print(np.mean(ls))
+    print(np.std(ls))
+    print(np.mean(ls)+ 1.7*np.std(ls))
+
+
 if __name__ == '__main__':
     pass
     # server_test()
-    case_test()
-
+    # case_test()
+    cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
 
