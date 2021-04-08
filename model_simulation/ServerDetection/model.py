@@ -2,8 +2,6 @@ import random
 from ServerDetection.server import Server
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
-import numpy as np
-import threading
 
 
 class Model:
@@ -13,7 +11,7 @@ class Model:
         self.counts = node_num
         self.nodes = {}
         self.normals = list(range(node_num))
-        self.maps = Maps(20, 20)
+        self.maps = Maps(10, 10)
         self.maps.init_loc(node_num)
         self.maps.print_map()
         self.sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
@@ -99,14 +97,10 @@ class Model:
 
 class Maps:
     def __init__(self, length: int, height: int):
-        self.maps = np.zeros((length+1, height+1), dtype=int).tolist()
-        self.middle_x = int(length/2)
-        self.middle_y = int(height/2)
-        self.x_max = int(length/2) if length%2==0 else int(length/2 + 1)
-        self.x_min = -int(length/2)
-        self.y_max = int(height/2) if height%2==0 else int(height/2 + 1)
-        self.y_min = -int(height/2)
-        self.maps[self.middle_y][self.middle_x] = -1
+        self.x_max = int(length)
+        self.x_min = -int(length)
+        self.y_max = int(height)
+        self.y_min = -int(height)
         self.loc_map = {}
 
     def init_loc(self, node_num: int):
@@ -118,11 +112,11 @@ class Maps:
             return False
         if x==0 and y==0:
             return False
-        if self.maps[self.middle_y - y][self.middle_x + x] == 0:
-            self.maps[self.middle_y - y][self.middle_x + x] = id+1
-            self.loc_map[id] = [x, y]
-            return True
-        return False
+        for _, loc in self.loc_map.items():
+            if x == loc[0] and y == loc[1]:
+                return False
+        self.loc_map[id] = [x, y]
+        return True
 
     def get_node_loc(self, id):
         if id in self.loc_map:
@@ -132,12 +126,11 @@ class Maps:
     def random_loc(self, id):
         x, y = 0, 0
         while True:
-            x = random.randint(self.x_min, self.x_max+1)
-            y = random.randint(self.y_min, self.y_max+1)
+            x = round(random.uniform(self.x_min, self.x_max), 5)
+            y = round(random.uniform(self.y_min, self.y_max), 5)
             if self.set_node(x, y, id):
                 break
 
     def print_map(self):
-        for i in range(len(self.maps)):
-            print(self.maps[i])
+        print(self.loc_map)
 
