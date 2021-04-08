@@ -1,8 +1,9 @@
 import math
 import threading
 import numpy as np
+from ServerDetection.utils import false_negative
 from ServerDetection.utils import iteration
-import time
+import json
 
 
 class Server(object):
@@ -30,7 +31,6 @@ class Server(object):
                 task: Task = self.msg_queue.pop()
                 task.run()
                 pass
-            time.sleep(0.5)
 
     def init_thread(self):
         td = threading.Thread(target=self.thread_loop_task)
@@ -43,7 +43,7 @@ class Server(object):
 
     def _process_finished_task(self):
         print("process finished! Score list:", self.score_list)
-        print("sentry record: ", self.sentry_record)
+        print("sentry record: ", json.dumps(self.sentry_record))
 
     # thread adding score task
     def suspect(self, node0, node1, rssi0, rssi1, listeners, broadcasters):
@@ -57,7 +57,7 @@ class Server(object):
                 ratios[broadcasters[i]] = -1
                 continue
             ratios[broadcasters[i]] = rssi0[i]/rssi1[i]
-        sorted(ratios, key=lambda x: ratios[x])
+        ratios = dict(sorted(ratios.items(), key=lambda item: item[1]))
         for i in range(len(ratios)):
             values = list(ratios.values())
             keys = list(ratios.keys())
@@ -65,11 +65,13 @@ class Server(object):
                 suspects[broadcasters[i]] = ""
             if i+1 == len(ratios):
                 break
-            if math.fabs(values[i] - values[i+1]) < 0.001:
+            if math.fabs(values[i] - values[i+1]) < 0.00001:
+
                 suspects[keys[i]] = ""
                 suspects[keys[i+1]] = ""
         for id, _ in suspects.items():
             self.score_list[id] += 1
+            false_negative(node0, node1, id)
         if len(suspects) > 0:
             self._add_record(node0, node1, suspects)
             self._add_record(node1, node0, suspects)
@@ -78,7 +80,6 @@ class Server(object):
     def hunt(self):
         # TODO: definitive sybil list
         definite_s = []
-        suspect = self.sentry_record
         while True:
             suspect_list = []
             # find the node with the highest score
@@ -87,18 +88,18 @@ class Server(object):
                 break
             if len(highest_list) > 1:
                 for node in highest_list:
-                    self._select_sybil_suspect(node, suspect, definite_s, suspect_list)
+                    self._select_sybil_suspect(node, definite_s, suspect_list)
             node = None
             if len(suspect_list) == 0:
                 node = highest_list[0]
             else:
                 node = suspect_list[0]
-            self.whitewash_and_punish(node, suspect, definite_s)
+            self.whitewash_and_punish(node, definite_s)
         print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
 
-    def whitewash_and_punish(self, node, suspect, definite_s):
-        for company_id in suspect[node]:  # go through to find all scores ought to be subtracted
-            company_dict = suspect[node][company_id]
+    def whitewash_and_punish(self, node, definite_s):
+        for company_id in self.sentry_record[node]:  # go through to find all scores ought to be subtracted
+            company_dict = self.sentry_record[node][company_id]
             score_sum = 0
             for node_id, node_score in company_dict.items():
                 if node_id in definite_s:
@@ -107,16 +108,16 @@ class Server(object):
                 self.score_list[node_id] = self.score_list[node_id] - node_score
             if self.score_list[company_id] >= 0:
                 self.score_list[company_id] = self.score_list[company_id] + score_sum
-            suspect[company_id].pop(node)
+            self.sentry_record[company_id].pop(node)
+        self.sentry_record[node].clear()
         self.score_list[node] = -1
         self.normal_list.remove(node)
-        self.score_list[node] = -1
         if node not in definite_s:
             definite_s.append(node)
 
-    def _select_sybil_suspect(self, node, suspect, definite_s, suspect_list):
-        for company_id in suspect[node]:  # if a node with the highest score fail to suspect a Sybil, it's eliminated
-            company_dict = suspect[node][company_id]
+    def _select_sybil_suspect(self, node, definite_s, suspect_list):
+        for company_id in self.sentry_record[node]:  # if a node with the highest score fail to suspect a Sybil, it's eliminated
+            company_dict = self.sentry_record[node][company_id]
             score_sum = 0
             for node_id in definite_s:
                 if node_id in company_dict:
@@ -158,11 +159,12 @@ class Server(object):
         self.msg_queue.push(task)
 
     def add_score(self):
-        for i in range(0, len(self.listeners), 2):
-            if i+1 == len(self.listeners):
-                break
-            id0 = self.listeners[i]
-            id1 = self.listeners[i+1]
+        listeners = self.listeners.copy()
+        while len(listeners) > 1:
+            id0 = listeners[0]
+            id1 = listeners[1]
+            listeners.remove(id0)
+            listeners.remove(id1)
             self._add_task(self.suspect, id0, id1,
                            self.rssi_list[id0], self.rssi_list[id1], self.listeners.copy(), self.broadcasters.copy())
 
@@ -191,7 +193,7 @@ class Server(object):
     def reset(self):
         self.score_list.clear()
         self.normal_list = list(range(self.node_num))
-        self.rounds = np.zeros((self.counts, self.cur_rnd), dtype=int).tolist()
+        self.rounds = np.zeros((self.node_num, self.cur_rnd), dtype=int).tolist()
         self.rssi_list = {}
         self.cur_rnd = 0
         self.listeners.clear()

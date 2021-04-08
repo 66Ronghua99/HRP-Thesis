@@ -1,21 +1,25 @@
 import random
 from ServerDetection.server import Server
 from ServerDetection.node import Node
+from ServerDetection.utils import set_s_n
 import numpy as np
+import threading
 
 
 class Model:
     def __init__(self, node_num, sybil_percent):
+        global normals
         self.server = Server(node_num)
         self.counts = node_num
         self.nodes = {}
         self.normals = list(range(node_num))
         self.maps = Maps(20, 20)
         self.maps.init_loc(node_num)
-        # self.maps.print_map()
+        self.maps.print_map()
         self.sybils = random.sample(range(self.counts), int(sybil_percent * self.counts))
         for id in self.sybils:
             self.normals.remove(id)
+        set_s_n(self.sybils, self.normals)
         self.init_nodes()
         pass
 
@@ -28,7 +32,8 @@ class Model:
 
     def main_process(self):
         # broadcasting and receiving process
-        print("Sybils:", self.sybils, "Normals:", self.normals)
+        print("Sybils:", self.sybils)
+        print("Normals:", self.normals)
         for rnd in range(self.server.total_rnds):
             self.server.begin_round()
             broadcasters = self.server.broadcast_node_list
@@ -44,6 +49,9 @@ class Model:
                     # Sybil receiver behavior
                     self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters)
         self.server.process_finished()
+        self.server._add_task(exit)
+        self.server.threads[0].join()
+        print()
 
     def _init_broadcasters(self, broadcasters):
         locations = self._b_locations(broadcasters)
