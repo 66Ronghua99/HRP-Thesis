@@ -4,6 +4,7 @@ import numpy as np
 from ServerDetection.utils import false_negative
 from ServerDetection.utils import iteration
 import json
+import random
 
 
 class Server(object):
@@ -183,8 +184,9 @@ class Server(object):
     def _add_score(self):
         listeners = self.listeners.copy()
         while len(listeners) > 1:
-            id0 = listeners[0]
-            id1 = listeners[1]
+            ids = random.sample(listeners, 2)
+            id0 = ids[0]
+            id1 = ids[1]
             listeners.remove(id0)
             listeners.remove(id1)
             self._add_task(self.suspect, id0, id1,
