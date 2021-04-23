@@ -96,8 +96,8 @@ class Server(object):
             else:
                 eliminate_list = suspect_list
             for node in eliminate_list:
-                if self._whitewash_and_punish(node, definite_s):
-                    break
+                self._whitewash_and_punish(node, definite_s)
+
         print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
 
     def _whitewash_and_punish(self, node, definite_s):
@@ -118,11 +118,12 @@ class Server(object):
             self.sentry_record[company_id].pop(node)
         self.sentry_record[node].clear()
         self.score_list[node] = -1
+        # The node votes for some other, it's not in definite_s and the node votes for nodes in definite_s
         if is_all_score_from_definite_sybils and node not in definite_s and has_suspect:
             return False
         self.normal_list.remove(node)
-        if node not in definite_s:
-            definite_s.append(node)
+        # if node not in definite_s:
+        #     definite_s.append(node)
         return True
 
     def _select_sybil_suspect(self, node, definite_s, suspect_list):

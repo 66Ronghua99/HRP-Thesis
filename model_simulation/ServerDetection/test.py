@@ -45,6 +45,8 @@ def case_test():
                 s_list = ast.literal_eval(line[first_comma+2:])
             elif line.startswith("Normal"):
                 n_list = ast.literal_eval(line[first_comma+2:])
+            elif line.startswith("Malicious"):
+                m_list = ast.literal_eval(line[first_comma+2:])
             elif line.startswith("process"):
                 score = ast.literal_eval(line[first_comma+2:])
             elif line.startswith("sentry"):
@@ -52,7 +54,8 @@ def case_test():
                 sentry_record = pythonify(j_string)
     print("Sybils:", s_list)
     print("Normals:", n_list)
-    server = Server(len(s_list) + len(n_list))
+    print("Malicious:", m_list)
+    server = Server(len(s_list) + len(n_list) + len(m_list))
     server.sentry_record = sentry_record
     server.score_list = score
     server.process_finished()
@@ -69,6 +72,6 @@ def cal_std_mean(ls):
 if __name__ == '__main__':
     pass
     # server_test()
-    # case_test()
-    cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
+    case_test()
+    # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
 
