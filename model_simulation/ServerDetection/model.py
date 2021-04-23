@@ -14,8 +14,8 @@ class Model:
         self.maps = Maps(10, 10)
         self.maps.init_loc(node_num)
         self.maps.print_map()
-        self.malicious: [] = None
-        self.malicious_ap: {} = None
+        self.malicious: [] = []
+        self.malicious_ap: {} = {}
         self.sybils = None
         self.init_evils(sybil_percent, malicious)
         self.init_nodes()
