@@ -181,6 +181,7 @@ class Server(object):
         task = Task(func, args=args, kwargs=kwargs)
         self.msg_queue.push(task)
 
+    # Possibly we can use all possible combination to give score
     def _add_score(self):
         listeners = self.listeners.copy()
         while len(listeners) > 1:
