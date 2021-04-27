@@ -3,6 +3,7 @@ import threading
 import numpy as np
 from ServerDetection.utils import false_negative
 from ServerDetection.utils import iteration
+from ServerDetection.log import log
 import json
 import random
 
@@ -43,8 +44,8 @@ class Server(object):
             self.sentry_record[id] = {}
 
     def _process_finished_task(self):
-        print("process finished! Score list:", self.score_list)
-        print("sentry record: ", json.dumps(self.sentry_record))
+        log("process finished! Score list:", self.score_list)
+        log("sentry record: ", json.dumps(self.sentry_record))
 
     # thread adding score task
     def suspect(self, node0, node1, rssi0, rssi1, listeners, broadcasters):
@@ -98,7 +99,7 @@ class Server(object):
             for node in eliminate_list:
                 self._whitewash_and_punish(node, definite_s)
 
-        print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
+        log("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
 
     def _whitewash_and_punish(self, node, definite_s):
         is_all_score_from_definite_sybils = True

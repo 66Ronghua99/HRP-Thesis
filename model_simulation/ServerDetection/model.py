@@ -2,6 +2,7 @@ import random
 from ServerDetection.server import Server
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
+from ServerDetection.log import log
 
 
 class Model:
@@ -13,7 +14,7 @@ class Model:
         self.normals = list(range(node_num))
         self.maps = Maps(10, 10)
         self.maps.init_loc(node_num)
-        self.maps.print_map()
+        # self.maps.print_map()
         self.malicious: [] = []
         self.malicious_ap: {} = {}
         self.sybils = None
@@ -45,9 +46,9 @@ class Model:
 
     def main_process(self):
         # broadcasting and receiving process
-        print("Sybils:", self.sybils)
-        print("Normals:", self.normals)
-        print("Malicious:", self.malicious)
+        log("Sybils:", self.sybils)
+        log("Normals:", self.normals)
+        log("Malicious:", self.malicious)
         for rnd in range(self.server.total_rnds):
             self.server.begin_round()
             broadcasters = self.server.broadcast_node_list
@@ -64,7 +65,7 @@ class Model:
                     self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters)
         self.server.process_finished()
         self.server.threads[0].join()
-        print()
+        log()
 
     def _init_broadcasters(self, broadcasters):
         locations = self._b_locations(broadcasters)
@@ -180,5 +181,5 @@ class Maps:
                 break
 
     def print_map(self):
-        print(self.loc_map)
+        log(self.loc_map)
 
