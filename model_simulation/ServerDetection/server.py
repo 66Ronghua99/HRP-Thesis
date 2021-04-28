@@ -21,6 +21,7 @@ class Server(object):
         self.broadcasters = []
         self.sentry_record = {}
         self.threads = []
+        self.threshold = 0
         self.msg_queue = Queue()
         self.init_thread()
         self.init_sertry_record()
@@ -156,7 +157,7 @@ class Server(object):
         for i in range(len(self.score_list)):
             if self.score_list[i] > max_point:
                 max_point = self.score_list[i]
-        if max_point <= 0:
+        if max_point <= self.threshold:
             return False
         for i in range(len(self.score_list)):
             if self.score_list[i] == max_point:

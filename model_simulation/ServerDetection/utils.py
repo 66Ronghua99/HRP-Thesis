@@ -39,3 +39,12 @@ def set_s_n(s, n):
     sybils = s
     normals = n
 
+
+def statistics(normal_list, sybil_list, result_list, fn, fp):
+    for id in normal_list:
+        if id not in result_list:
+            fn[-1] += 1
+    for id in sybil_list:
+        if id in result_list:
+            fp[-1] += 1
+

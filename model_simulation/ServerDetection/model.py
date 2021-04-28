@@ -1,14 +1,15 @@
 import random
 from ServerDetection.server import Server
+from ServerDetection.server2 import Server2
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
 from ServerDetection.log import log
 
 
 class Model:
-    def __init__(self, node_num, sybil_percent, malicious=0):
+    def __init__(self, node_num, sybil_percent, malicious=0, server="server"):
         global normals
-        self.server = Server(node_num)
+        self.server = self._init_server(server, node_num)
         self.counts = node_num
         self.nodes = {}
         self.normals = list(range(node_num))
@@ -142,6 +143,12 @@ class Model:
                 sybil: Node = self.nodes[b]
                 node.set_rssi(b, sybil.gps_loc, 1)
         node.report(self.server)
+
+    def _init_server(self, server, num):
+        if server == "server":
+            return Server(num)
+        else:
+            return Server2(num)
 
 
 class Maps:
