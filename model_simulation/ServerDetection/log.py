@@ -1,5 +1,5 @@
-on_terminal = False
-to_file = True
+on_terminal = True
+to_file = False
 log_file = None
 
 
