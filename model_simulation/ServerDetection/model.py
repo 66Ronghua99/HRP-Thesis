@@ -4,6 +4,7 @@ from ServerDetection.server2 import Server2
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
 from ServerDetection.log import log
+from ServerDetection.method_comparison import ComparisonServer
 
 
 class Model:
@@ -147,8 +148,10 @@ class Model:
     def _init_server(self, server, num):
         if server == "server":
             return Server(num)
-        else:
+        elif server == "server2":
             return Server2(num)
+        else:
+            return ComparisonServer(num)
 
 
 class Maps:

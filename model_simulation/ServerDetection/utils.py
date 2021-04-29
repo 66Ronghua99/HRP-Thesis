@@ -48,3 +48,12 @@ def statistics(normal_list, sybil_list, result_list, fn, fp):
         if id in result_list:
             fp[-1] += 1
 
+
+def method_statistics(normal_list, sybil_list, fn, fp, n_total, s_total, hunters: list):
+    n_total[-1] += len(normal_list)
+    s_total[-1] += len(sybil_list)
+    for i in range(len(hunters)):
+        hunter = hunters[i]
+        statistics(normal_list, sybil_list, hunter.normal_list, fn[i], fp[i])
+
+

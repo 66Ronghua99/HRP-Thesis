@@ -3,6 +3,7 @@ from ServerDetection.utils import euclidean_d
 import json
 import ast
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def server_test():
@@ -69,9 +70,57 @@ def cal_std_mean(ls):
     print(np.mean(ls)+ 1.7*np.std(ls))
 
 
+def plot_sentry_comparison():
+    fn = None
+    fp = None
+    n_total = None
+    s_total = None
+    counter = 0
+    ctr2 = 0
+    with open("sentry_comparison.txt", "r") as file:
+        for line in file:
+            line = line.strip()
+            if line == "":
+                counter = 0
+                continue
+            if counter == 0:
+                fn = ast.literal_eval(line)[:-1]
+            elif counter == 1:
+                n_total = ast.literal_eval(line)[:-1]
+            elif counter == 2:
+                fp = ast.literal_eval(line)[:-1]
+            else:
+                s_total = ast.literal_eval(line)[:-1]
+                plot(fn, fp, n_total, s_total, ctr2)
+                ctr2 += 1
+            counter += 1
+        plt.xlabel("number of nodes")
+        plt.ylabel("Sybil eviction rate/%")
+        plt.legend()
+        plt.show()
+
+
+def plot(fn, fp, n_total, s_total, ctr):
+    fn_rate = []
+    fp_rate = []
+    number = []
+    for i in range(len(fp)):
+        fn_rate.append(100 * (1 - fn[i]/n_total[i]))
+        fp_rate.append(100 * (1 - fp[i]/s_total[i]))
+        number.append(int(i + 10))
+    # plt.plot(number, fn_rate, "o-")
+    plt.plot(number, fp_rate, "o-", label=labels[ctr])
+    plt.xticks(number, number[::1])
+
+
+labels = ["0 rooted device, randomly pair sentries", "0 rooted device, all possible sentries",
+          "1 rooted device, randomly pair sentries", "1 rooted device, all possible sentries"]
+
+
 if __name__ == '__main__':
     pass
     # server_test()
-    case_test()
+    # case_test()
     # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
+    plot_sentry_comparison()
 
