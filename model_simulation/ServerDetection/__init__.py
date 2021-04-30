@@ -84,8 +84,17 @@ def eviction_comparison(filename):
     data_clear()
 
 
+def average_score_statistics():
+    for i in range(10, 41, 5):
+        for j in range(100):
+            model = Model(20, i/100)
+            model.main_process()
+            
+
+
 if __name__ == '__main__':
     # basic()
     # score_comparison()
     # score_comparison(server="server2")
-    eviction_comparison("eviction_comparison")
+    # eviction_comparison("eviction_comparison.txt")
+    average_score_statistics()

@@ -113,8 +113,64 @@ def plot(fn, fp, n_total, s_total, ctr):
     plt.xticks(number, number[::1])
 
 
-labels = ["0 rooted device, randomly pair sentries", "0 rooted device, all possible sentries",
-          "1 rooted device, randomly pair sentries", "1 rooted device, all possible sentries"]
+labels = ["1 device, randomly pair sentries", "1 device, all possible sentries",
+          "2 devices, randomly pair sentries", "2 devices, all possible sentries"]
+labels2 = ["Sybil eviction rate", "honest eviction rate"]
+
+
+def plot2(fn, fp, n_total, s_total):
+    fn_rate = []
+    fp_rate = []
+    number = []
+    for j in range(len(fp)):
+        fn_rate.append([])
+        fp_rate.append([])
+        for i in range(len(fp[j])):
+            fn_rate[j].append(100 * fn[j][i]/n_total[i])
+            fp_rate[j].append(100 * (1 - fp[j][i]/s_total[i]))
+            if len(number) == len(n_total):
+                continue
+            number.append(int(i + 10))
+    # plt.plot(number, fn_rate, "o-")
+    for ctr in range(len(fp_rate)):
+        plt.plot(number, fp_rate[ctr], "o-", label=f'Method {ctr + 1} '+labels2[ctr])
+        plt.plot(number, fn_rate[ctr], "s-", label=f'Method {ctr + 1} '+labels2[ctr])
+    plt.xticks(number, number[::1])
+
+
+def plot_eviction_comparison():
+    fn = None
+    fp = None
+    n_total = None
+    s_total = None
+    counter = 0
+    with open("eviction_comparison.txt", "r") as file:
+        for line in file:
+            line = line.strip()
+            if line == "":
+                counter = 0
+                continue
+            if counter == 0:
+                fn = ast.literal_eval(line)[:-1]
+                remove_last(fn)
+            elif counter == 1:
+                n_total = ast.literal_eval(line)[:-1]
+            elif counter == 2:
+                fp = ast.literal_eval(line)[:-1]
+                remove_last(fp)
+            else:
+                s_total = ast.literal_eval(line)[:-1]
+                plot2(fn, fp, n_total, s_total)
+            counter += 1
+        plt.xlabel("number of nodes")
+        plt.ylabel("rate/%")
+        plt.legend()
+        plt.show()
+
+
+def remove_last(ls):
+    for l in ls:
+        l.pop()
 
 
 if __name__ == '__main__':
@@ -123,4 +179,4 @@ if __name__ == '__main__':
     # case_test()
     # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
     plot_sentry_comparison()
-
+    plot_eviction_comparison()
