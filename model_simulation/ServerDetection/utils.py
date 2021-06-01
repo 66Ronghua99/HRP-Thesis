@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 sybils = []
 normals = []
@@ -57,3 +58,12 @@ def method_statistics(normal_list, sybil_list, fn, fp, n_total, s_total, hunters
         statistics(normal_list, sybil_list, hunter.normal_list, fn[i], fp[i])
 
 
+def score_statistics(score_list: list, normals: list, sybils: list, n_score: list, s_score: list):
+    for id in normals:
+        n_score.append(score_list[id])
+    for id in sybils:
+        s_score.append(score_list[id])
+    avg_n = np.mean(n_score)
+    avg_s = np.mean(s_score)
+    n_score[0] = avg_n
+    s_score[0] = avg_s

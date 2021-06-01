@@ -35,9 +35,10 @@ import java.security.Permission;
 public class MainActivity extends AppCompatActivity {
 
     private boolean isBound = false;
-    private static String TAG = "DetectMagisk";
+    public final static String TAG = "DetectMagisk";
     private IBinder mRemote;
     private RootDetection checker;
+    WiFiInfo mWiFiInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +97,12 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.wifi).setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               HardwareExamination.getInstance(getApplicationContext()).scanWifi();
+               mWiFiInfo = WiFiInfo.getInstance(getApplicationContext());
+               mWiFiInfo.enableWiFi();
+               mWiFiInfo.wifiScanList();
+               Intent intent = new Intent(getApplicationContext(), WiFiResultActivity.class);
+               intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+               getApplicationContext().startActivity(intent);
            }
        });
 

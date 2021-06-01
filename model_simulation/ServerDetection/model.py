@@ -4,7 +4,7 @@ from ServerDetection.server2 import Server2
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
 from ServerDetection.log import log
-from ServerDetection.method_comparison import ComparisonServer
+from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer
 
 
 class Model:
@@ -150,8 +150,10 @@ class Model:
             return Server(num)
         elif server == "server2":
             return Server2(num)
-        else:
+        elif server == "compare":
             return ComparisonServer(num)
+        else:
+            return ScoreOnlyServer(num)
 
 
 class Maps:

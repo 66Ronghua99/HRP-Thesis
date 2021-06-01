@@ -84,6 +84,6 @@ class PreviousEviction(ThresholdOnly):
         return True
 
 
-class NewEviction(ThresholdOnly):
+class ScoreOnlyServer(Server2):
     def hunt(self):
-        pass
+        print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))

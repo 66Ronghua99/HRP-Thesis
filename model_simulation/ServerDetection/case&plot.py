@@ -1,3 +1,5 @@
+from matplotlib import transforms
+
 from ServerDetection.server import Server
 from ServerDetection.utils import euclidean_d
 import json
@@ -94,9 +96,9 @@ def plot_sentry_comparison():
                 plot(fn, fp, n_total, s_total, ctr2)
                 ctr2 += 1
             counter += 1
-        plt.xlabel("number of nodes")
-        plt.ylabel("Sybil eviction rate/%")
-        plt.legend()
+        plt.xlabel("number of nodes", fontsize=18)
+        plt.ylabel("Sybil eviction rate/%", fontsize=18)
+        plt.legend(prop={'size': 17})
         plt.show()
 
 
@@ -162,15 +164,40 @@ def plot_eviction_comparison():
                 s_total = ast.literal_eval(line)[:-1]
                 plot2(fn, fp, n_total, s_total)
             counter += 1
-        plt.xlabel("number of nodes")
-        plt.ylabel("rate/%")
-        plt.legend()
+        plt.xlabel("number of nodes", fontsize=18)
+        plt.ylabel("rate/%", fontsize=18)
+        plt.legend(prop={'size': 15})
         plt.show()
 
 
 def remove_last(ls):
     for l in ls:
         l.pop()
+
+
+def plot_avg_score():
+    avg_n = None
+    avg_s = None
+    counter = 0
+    with open("average_comparison.txt", "r") as file:
+        for line in file:
+            line.strip()
+            if counter == 0:
+                avg_n = ast.literal_eval(line)
+            else:
+                avg_s = ast.literal_eval(line)
+            counter += 1
+    x_axis = list(range(10, 41, 5))
+    print(avg_n, avg_s)
+    plt.bar([i - 0.5 for i in x_axis], avg_n, 1, color='b', label="normal nodes")
+    plt.bar([i + 0.5 for i in x_axis], avg_s, 1, color='r', label="Sybil nodes")
+    plt.xticks(x_axis, x_axis)
+    plt.xlabel("Percentage of Sybil nodes", fontsize=15)
+    plt.ylabel("Average score of nodes/%", fontsize=15)
+    plt.axhline(48, 0, 40, color='y', linestyle='--', linewidth=2)
+    plt.text(5.6, 47, "48", size="medium")
+    plt.legend(prop={'size': 15})
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -180,3 +207,4 @@ if __name__ == '__main__':
     # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
     plot_sentry_comparison()
     plot_eviction_comparison()
+    plot_avg_score()

@@ -1,11 +1,18 @@
 from ServerDetection.model import Model
-from ServerDetection.utils import statistics
+from ServerDetection.utils import statistics, score_statistics, method_statistics
 from ServerDetection.log import log
-from ServerDetection.utils import method_statistics
+from ServerDetection.server import Server
+from ServerDetection.server2 import Server2
+from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer
+
 fp: list = []
 fn: list = []
 n_total: list = []
 s_total: list = []
+n_score = []
+s_score = []
+avg_n = []
+avg_s = []
 
 
 def basic():
@@ -86,10 +93,17 @@ def eviction_comparison(filename):
 
 def average_score_statistics():
     for i in range(10, 41, 5):
-        for j in range(100):
-            model = Model(20, i/100)
+        for j in range(50):
+            model = Model(20, i/100, server="score")
             model.main_process()
-            
+            server: Server = model.server
+            score_statistics(server.score_list, model.normals, model.sybils, n_score, s_score)
+        avg_n.append(n_score[0])
+        avg_s.append(s_score[0])
+        n_score.clear()
+        s_score.clear()
+    log(avg_n, file="average_comparison.txt")
+    log(avg_s, file="average_comparison.txt")
 
 
 if __name__ == '__main__':
