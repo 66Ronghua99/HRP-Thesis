@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ronghua.caserver.dao.CertMapper">
+    <resultMap id="CertEntity" type="com.ronghua.caserver.entity.CertEntity">
+        <id column="userId" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" javaType="String" jdbcType="VARCHAR"/>
+        <result column="timeMillis" property="timeMillis" javaType="long" jdbcType="BIGINT"/>
+        <result column="encodedCert" property="encodedCert" javaType="String" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Items">
+        username, timeMillis, encodedCert
+    </sql>
+
+    <insert id="insertCert" parameterType="com.ronghua.caserver.entity.CertEntity">
+        INSERT INTO certificate (
+            username, timeMillis, encodedCert
+        ) VALUES (
+                    #{username}, #{timeMillis}, #{encodedCert}
+                 )
+    </insert>
+
+    <select id="getCertByName" parameterType="String" resultType="com.ronghua.caserver.entity.CertEntity">
+        SELECT
+            <include refid="Items"/>
+        FROM certificate
+        WHERE username = #{username}
+    </select>
+
+    <delete id="deleteCertByName" parameterType="String">
+        DELETE FROM certificate
+        WHERE username = #{username}
+    </delete>
+
+    <delete id="deleteAllInvalid" parameterType="Long">
+        DELETE FROM certificate
+        WHERE (#{time} - timeMillis) > 60000
+    </delete>
+
+</mapper>

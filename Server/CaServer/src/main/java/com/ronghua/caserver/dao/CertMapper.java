@@ -10,4 +10,8 @@ public interface CertMapper {
 
     CertEntity getCertByName(String username);
 
+    void deleteCertByName(String username);
+
+    void deleteAllInvalid(long time);
+
 }

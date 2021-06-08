@@ -1,16 +1,25 @@
 package com.ronghua.caserver.entity;
 
 public class CertEntity {
+    private int userId;
     private String username;
-    private String encodedCsr;
-    private long timeMills;
+    private String encodedCert;
+    private long timeMillis;
 
-    public long getTimeMills() {
-        return timeMills;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setTimeMills(long timeMills) {
-        this.timeMills = timeMills;
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public long getTimeMillis() {
+        return timeMillis;
+    }
+
+    public void setTimeMillis(long timeMillis) {
+        this.timeMillis = timeMillis;
     }
 
     public String getUsername() {
@@ -21,11 +30,11 @@ public class CertEntity {
         this.username = username;
     }
 
-    public String getEncodedCsr() {
-        return encodedCsr;
+    public String getEncodedCert() {
+        return encodedCert;
     }
 
-    public void setEncodedCsr(String encodedCsr) {
-        this.encodedCsr = encodedCsr;
+    public void setEncodedCert(String encodedCert) {
+        this.encodedCert = encodedCert;
     }
 }

@@ -1,6 +1,7 @@
 package com.ronghua.caserver.service;
 
 import com.ronghua.caserver.dao.CertMapper;
+import com.ronghua.caserver.entity.CertEntity;
 import com.ronghua.caserver.msgbody.SignReqResp;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
@@ -25,6 +26,7 @@ import org.springframework.util.ResourceUtils;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -38,8 +40,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class CaService {
-//    @Autowired
-//    private CertMapper certDao;
+    @Autowired
+    private CertMapper certDao;
     private static  PrivateKey privateKey;
     private static X509Certificate certificate;
     private long bigInteger = 1;
@@ -64,12 +66,34 @@ public class CaService {
         try {
             csr = getCsrFromBase64(request.getEncodedCsr());
             crt = sign(csr, privateKey);
-            System.out.println(crt.getEncoded().length);
+            recordCert(crt, request.getUsername());
             response.setEncodedCsr(Base64.getEncoder().encodeToString(crt.getEncoded()));
+            response.setUsername(request.getUsername());
         } catch (IOException | OperatorCreationException | CertificateException e) {
             e.printStackTrace();
         }
         return new AsyncResult<>(response);
+    }
+
+    private void recordCert(X509Certificate crt, String username) throws CertificateEncodingException {
+        CertEntity entity = new CertEntity();
+        Base64.Encoder encoder = Base64.getEncoder();
+        entity.setEncodedCert(encoder.encodeToString(crt.getEncoded()));
+        entity.setTimeMillis(System.currentTimeMillis());
+        entity.setUsername(username);
+        certDao.insertCert(entity);
+    }
+
+    public CertEntity getCertByName(String username){
+        return certDao.getCertByName(username);
+    }
+
+    public void deleteInvalidCert(){
+        certDao.deleteAllInvalid(System.currentTimeMillis());
+    }
+
+    public void deleteCertByName(String username){
+        certDao.deleteCertByName(username);
     }
 
     private PKCS10CertificationRequest getCsrFromBase64(String code) throws IOException {
@@ -131,8 +155,7 @@ public class CaService {
 //        byte [] decoded = Base64.decode(privatePem);
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(bytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
-        PrivateKey privateKey = kf.generatePrivate(spec);
-        return privateKey;
+        return kf.generatePrivate(spec);
     }
 
 
@@ -141,8 +164,7 @@ public class CaService {
         File file = new File(path);
         FileInputStream fis = new FileInputStream(file);
         CertificateFactory f = CertificateFactory.getInstance("X.509");
-        X509Certificate certificate = (X509Certificate)f.generateCertificate(fis);
-        return certificate;
+        return (X509Certificate)f.generateCertificate(fis);
     }
 
     private static byte[] getBytesFromFile(String filename) throws IOException {
