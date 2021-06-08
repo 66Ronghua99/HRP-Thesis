@@ -3,7 +3,7 @@ package com.ronghua.caserver.entity;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
-public class SendMailRequest {
+public class MailEntity {
 
     @NotEmpty
     private String subject;

@@ -1,7 +1,9 @@
 package com.ronghua.caserver.controller;
 
 import com.ronghua.caserver.entity.CertEntity;
-import com.ronghua.caserver.msgbody.SignReqResp;
+import com.ronghua.caserver.msgbody.SignRequest;
+import com.ronghua.caserver.msgbody.SignRequestVerified;
+import com.ronghua.caserver.msgbody.SignResponse;
 import com.ronghua.caserver.service.CaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,11 +25,17 @@ public class CertificateController {
 
     //post csr to get signed
     @PostMapping("/csr")
-    public ResponseEntity<SignReqResp> signRequest(@Valid @RequestBody SignReqResp requestBody) throws ExecutionException, InterruptedException {
+    public ResponseEntity<SignResponse> signRequest(@Valid @RequestBody SignRequestVerified requestBody) throws ExecutionException, InterruptedException {
         System.out.println("enter csr controller");
-        Future<SignReqResp> futureResult = caService.signCertificate(requestBody);
-        SignReqResp response = futureResult.get();
+        Future<SignResponse> futureResult = caService.signCertificate(requestBody);
+        SignResponse response = futureResult.get();
         return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/csr/auth")
+    public void signRequest(@Valid @RequestBody SignRequest request){
+        System.out.println("enter verified controller");
+        caService.accountVerify(request);
     }
 
     @PostMapping(value = "name")

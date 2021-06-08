@@ -1,8 +1,8 @@
 package com.ronghua.caserver.msgbody;
 
-public class SignReqResp {
+public class SignRequestVerified {
     private String username;
-    private String encodedCsr;
+    private String code;
 
     public String getUsername() {
         return username;
@@ -12,11 +12,11 @@ public class SignReqResp {
         this.username = username;
     }
 
-    public String getEncodedCsr() {
-        return encodedCsr;
+    public String getCode() {
+        return code;
     }
 
-    public void setEncodedCsr(String encodedCsr) {
-        this.encodedCsr = encodedCsr;
+    public void setCode(String code) {
+        this.code = code;
     }
 }

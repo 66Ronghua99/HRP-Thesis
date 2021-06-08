@@ -1,8 +1,12 @@
 package com.ronghua.caserver.service;
 
 import com.ronghua.caserver.dao.CertMapper;
+import com.ronghua.caserver.dao.CsrMapper;
 import com.ronghua.caserver.entity.CertEntity;
-import com.ronghua.caserver.msgbody.SignReqResp;
+import com.ronghua.caserver.entity.CsrEntity;
+import com.ronghua.caserver.msgbody.SignRequest;
+import com.ronghua.caserver.msgbody.SignRequestVerified;
+import com.ronghua.caserver.msgbody.SignResponse;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.Certificate;
@@ -32,8 +36,8 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
-import java.util.Date;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -42,6 +46,16 @@ import java.util.concurrent.locks.ReentrantLock;
 public class CaService {
     @Autowired
     private CertMapper certDao;
+
+    @Autowired
+    private CsrMapper csrDao;
+
+    @Autowired
+    private MailAuthService mailAuthService;
+
+    private final static int ERROR_TIME_EXCEEDED = 2;
+    private final static int ERROR_CONFLICT = 1;
+    private final static int SUCCESS = 0;
     private static  PrivateKey privateKey;
     private static X509Certificate certificate;
     private long bigInteger = 1;
@@ -57,22 +71,54 @@ public class CaService {
 
     }
 
+    public void accountVerify(SignRequest request){
+        String code = mailAuthService.sendAuthMail(request.getUsername());
+        CsrEntity entity = new CsrEntity();
+        entity.setCode(code.toLowerCase(Locale.ROOT));
+        entity.setUsername(request.getUsername());
+        entity.setEncodedCsr(request.getEncodedCsr());
+        entity.setTimeMillis(System.currentTimeMillis());
+        csrDao.insertCsr(entity);
+    }
+
     @Async("certificateExecutor")
-    public Future<SignReqResp> signCertificate(SignReqResp request){
+    public Future<SignResponse> signCertificate(SignRequestVerified request){
         System.out.println("Service is called");
+        SignResponse response =  new SignResponse();
+        CsrEntity entity = verifyAndGetCsr(request, response);
+        if(response.getErrorCode() != SUCCESS)
+            return new AsyncResult<>(response);
         PKCS10CertificationRequest csr = null;
         X509Certificate crt = null;
-        SignReqResp response =  new SignReqResp();
         try {
-            csr = getCsrFromBase64(request.getEncodedCsr());
+            csr = getCsrFromBase64(entity.getEncodedCsr());
             crt = sign(csr, privateKey);
             recordCert(crt, request.getUsername());
-            response.setEncodedCsr(Base64.getEncoder().encodeToString(crt.getEncoded()));
+            response.setEncodedCrt(Base64.getEncoder().encodeToString(crt.getEncoded()));
             response.setUsername(request.getUsername());
+            response.setErrorCode(0);
         } catch (IOException | OperatorCreationException | CertificateException e) {
             e.printStackTrace();
         }
         return new AsyncResult<>(response);
+    }
+
+    private CsrEntity verifyAndGetCsr(SignRequestVerified request, SignResponse response) {
+        List<CsrEntity> csrEntities =  csrDao.getCsrsByNameAndCode(request.getUsername(), request.getCode().toLowerCase(Locale.ROOT));
+        if(csrEntities.size() != 1){
+            response.setError("Something wrong with your code or their is a code conflict");
+            response.setErrorCode(ERROR_CONFLICT);
+            return null;
+        }
+        csrDao.deleteCsrByNameAndCode(request.getUsername(), request.getCode());
+        CsrEntity entity = csrEntities.get(0);
+        if(entity.getTimeMillis() + 300*1000 < System.currentTimeMillis()){
+            response.setErrorCode(ERROR_TIME_EXCEEDED);
+            response.setError("time exceed");
+            return entity;
+        }
+        response.setErrorCode(SUCCESS);
+        return entity;
     }
 
     private void recordCert(X509Certificate crt, String username) throws CertificateEncodingException {

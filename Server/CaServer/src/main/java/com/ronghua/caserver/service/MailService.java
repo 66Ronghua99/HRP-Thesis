@@ -1,6 +1,6 @@
 package com.ronghua.caserver.service;
 
-import com.ronghua.caserver.entity.SendMailRequest;
+import com.ronghua.caserver.entity.MailEntity;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -17,7 +17,6 @@ public class MailService {
     private Properties properties;
     private Authenticator authenticator;
     private InternetAddress internetAddress;
-    private List<Message> mailMessages;
     private long timeStamp;
 
 
@@ -25,7 +24,6 @@ public class MailService {
         this.properties = properties;
         this.authenticator = authenticator;
         this.internetAddress = internetAddress;
-        mailMessages = new ArrayList<>();
         timeStamp = System.currentTimeMillis();
     }
 
@@ -34,14 +32,14 @@ public class MailService {
     }
 
     public void sendMail(String subject, String content, List<String> receivers){
-        SendMailRequest request = new SendMailRequest();
+        MailEntity request = new MailEntity();
         request.setSubject(subject);
         request.setContent(content);
         request.setReceivers(receivers);
         sendMail(request);
     }
 
-    public void sendMail(SendMailRequest request) {
+    public void sendMail(MailEntity request) {
 
         Session session = Session.getInstance(properties, authenticator);
         try {
@@ -54,7 +52,6 @@ public class MailService {
             }
 
             Transport.send(message);
-            mailMessages.add(message);
         } catch (Exception e) {
             e.printStackTrace();
         }

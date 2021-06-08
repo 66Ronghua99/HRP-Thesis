@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ronghua.caserver.dao.CsrMapper">
+
+    <sql id="Items">
+        username, timeMillis, encodedCsr, code
+    </sql>
+
+    <select id="getCsrsByNameAndCode" resultType="com.ronghua.caserver.entity.CsrEntity">
+        SELECT
+            *
+        FROM csr
+        WHERE username = #{username} AND code = #{code}
+    </select>
+
+    <insert id="insertCsr" parameterType="com.ronghua.caserver.entity.CsrEntity">
+        INSERT INTO csr(
+            username, timeMillis, encodedCsr, code
+        ) VALUES (
+            #{username}, #{timeMillis}, #{encodedCsr}, #{code}
+        )
+    </insert>
+
+    <delete id="deleteCsrByNameAndCode">
+        DELETE FROM csr
+        WHERE username = #{username} AND code = #{code}
+    </delete>
+</mapper>
