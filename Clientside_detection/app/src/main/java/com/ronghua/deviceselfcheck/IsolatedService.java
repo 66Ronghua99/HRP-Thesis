@@ -1,4 +1,4 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.root_emu;
 
 import android.app.Service;
 import android.content.Intent;
@@ -9,11 +9,9 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class IsolatedService extends Service {
     private static String[] blackListMountPaths = {"/sbin/.magisk/",

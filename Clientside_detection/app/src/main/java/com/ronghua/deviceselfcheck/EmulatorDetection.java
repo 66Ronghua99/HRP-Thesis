@@ -1,17 +1,10 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.root_emu;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.ronghua.deviceselfcheck.EmulatorDetector;
 
 public class EmulatorDetection {
     private Context mContext;

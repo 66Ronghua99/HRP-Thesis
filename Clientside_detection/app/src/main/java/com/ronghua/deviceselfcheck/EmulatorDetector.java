@@ -1,4 +1,4 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.root_emu;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -13,17 +13,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
-import com.ronghua.deviceselfcheck.Utils.Property;
+import com.ronghua.root_emu.Utils.Property;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Copyright 2016 Framgia, Inc.

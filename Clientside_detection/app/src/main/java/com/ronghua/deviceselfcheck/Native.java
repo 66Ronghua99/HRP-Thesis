@@ -1,4 +1,4 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.root_emu;
 
 public class Native {
     static {

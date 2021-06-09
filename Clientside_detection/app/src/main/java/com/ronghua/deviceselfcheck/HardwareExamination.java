@@ -1,9 +1,7 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.root_emu;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -14,17 +12,13 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.ResultReceiver;
 
-import com.ronghua.deviceselfcheck.Utils.Const;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class HardwareExamination {
     public Handler mainHandler;

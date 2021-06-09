@@ -1,4 +1,4 @@
-package com.ronghua.deviceselfcheck;
+package com.ronghua.root_emu;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,11 +7,10 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.RemoteException;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ronghua.deviceselfcheck.Utils.Const;
+import com.ronghua.root_emu.Utils.Const;
 
 import java.io.BufferedReader;
 import java.io.File;
