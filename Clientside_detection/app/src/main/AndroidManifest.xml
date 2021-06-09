@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.ronghua.deviceselfcheck">
+    package="com.ronghua.selfcheck">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
@@ -26,7 +26,7 @@
         tools:ignore="HardcodedDebugMode">
         <activity android:name=".DetectResultActivity">
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.ronghua.selfcheck.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

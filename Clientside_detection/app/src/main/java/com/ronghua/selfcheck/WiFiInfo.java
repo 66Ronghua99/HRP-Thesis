@@ -1,4 +1,4 @@
-package com.ronghua.root_emu;
+package com.ronghua.selfcheck;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

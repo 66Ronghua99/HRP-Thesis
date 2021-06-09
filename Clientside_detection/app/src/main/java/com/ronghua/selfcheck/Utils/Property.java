@@ -1,4 +1,4 @@
-package com.ronghua.root_emu.Utils;
+package com.ronghua.selfcheck.Utils;
 
 public class Property {
     public String name;
