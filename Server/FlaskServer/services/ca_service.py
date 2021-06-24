@@ -8,6 +8,7 @@ from database import Cert, insert, Csr, get_csr, delete
 from entities import sign_response
 from main import mail, app
 from flask_mail import Message
+from utils import base64encode, base64decode
 
 ca_cert = None
 ca_private_key = None
@@ -36,7 +37,6 @@ def sign_csr(request_data):
     req = OpenSSL.crypto.load_certificate_request(OpenSSL.crypto.FILETYPE_ASN1, csr)
     cert = create_cert(req)
     encoded_cert = base64encode(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert)) # dump cert to byte
-    insert(Cert(username=username, timeMillis=current_time_millis(), encodedCert=encoded_cert))
     response["username"] = username
     response["encodedCert"] = encoded_cert
     response["return code"] = 200
@@ -104,13 +104,14 @@ def auth_and_sign(request_data):
     return response
 ############
 
+######## authenticate user http request ########
+def request_auth(request_data):
+    pass
+###############################################
 
-def base64encode(input):
-    return base64.b64encode(input).decode()
-
-
-def base64decode(input):
-    return base64.b64decode(input)
+def get_pub_key(key):
+    key = base64decode(key)
+    return OpenSSL.crypto.load_publickey(OpenSSL.crypto.FILETYPE_ASN1, base64decode(key))
 
 
 def current_time_millis():
