@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck;
+package com.ronghua.deviceselfcheck;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ronghua.root_emu.Utils.Const;
+import com.ronghua.deviceselfcheck.Utils.Const;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -156,7 +156,7 @@ public class RootDetection {
 
     public boolean suFileDetection(){
         return filePathDetection("su")||filePathDetection("magisk")
-                ||filePathDetection("busybox");
+                ||filePathDetection("busybox") || Native.isSuExist();
     }
 
     public boolean filePathDetection(String filename){

@@ -49,10 +49,6 @@ JNIEXPORT jboolean Java_com_ronghua_deviceselfcheck_Native_detectMagiskNative(
     bool bRet = false;
     bRet = isMountPathDetected();
     if(bRet)
-        goto exit;
-    bRet = isSuPathDetected();
-    exit:
-    if(bRet)
         return JNI_TRUE;
     else
         return JNI_FALSE;
@@ -122,4 +118,9 @@ static inline bool isSuPathDetected(){
     }
 
     return bRet;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_ronghua_deviceselfcheck_Native_isSuExist(JNIEnv *env, jclass clazz) {
+    return isSuPathDetected();
 }

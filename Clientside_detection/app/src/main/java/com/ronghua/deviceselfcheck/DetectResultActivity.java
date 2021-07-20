@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck;
+package com.ronghua.deviceselfcheck;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
