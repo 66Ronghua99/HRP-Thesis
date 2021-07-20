@@ -1,14 +1,13 @@
 import random
 from ServerDetection.server import Server
-from ServerDetection.server2 import Server2
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
 from ServerDetection.log import log
-from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer
+from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer, AllCombinationServer, NRoundServer
 
 
 class Model:
-    def __init__(self, node_num, sybil_percent, malicious=0, server="server"):
+    def __init__(self, node_num, sybil_percent, malicious=0, server=1):
         global normals
         self.server = self._init_server(server, node_num)
         self.counts = node_num
@@ -146,14 +145,21 @@ class Model:
         node.report(self.server)
 
     def _init_server(self, server, num):
-        if server == "server":
+        if server == 0:
             return Server(num)
-        elif server == "server2":
-            return Server2(num)
-        elif server == "compare":
+        elif server == 1:
+            return AllCombinationServer(num)
+        elif server == 3:
             return ComparisonServer(num)
-        else:
+        elif server == 4:
             return ScoreOnlyServer(num)
+        elif server == 5:
+            return NRoundServer(num)
+
+
+class NormalSybilModel(Model):
+    def _sybil_receiver_behavior(self, node, locations, signal_strength, broadcasters):
+        self._normal_receiver_behavior(node, locations, signal_strength, broadcasters)
 
 
 class Maps:

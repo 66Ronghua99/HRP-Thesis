@@ -22,6 +22,7 @@ class Server(object):
         self.sentry_record = {}
         self.threads = []
         self.threshold = 0
+        self.definitive_sybil_threshold = 0
         self.msg_queue = Queue()
         self.init_thread()
         self.init_sertry_record()
@@ -80,8 +81,9 @@ class Server(object):
 
     # thread task: hunt sybil nodes
     def hunt(self):
-        # TODO: definitive sybil list
+        # TODO: the first node eliminated should be added to definitive sybil list
         definite_s = []
+        self.definitive_sybil_threshold = (int(self.node_num*3/10) * (int(self.node_num*3/10) - 1))/2 * self.rnd
         while True:
             self._select_definite_sybils(definite_s)
             suspect_list = []
@@ -145,11 +147,8 @@ class Server(object):
             if self.score_list[id] < 0:
                 continue
             score_list[id] = self.score_list[id]
-        std = np.std(list(score_list.values()))
-        mean = np.mean(list(score_list.values()))
-        threshold = mean + 1.7 * std
         for id, score in score_list.items():
-            if score > threshold and id not in d_s:
+            if score > self.definitive_sybil_threshold and id not in d_s:
                 d_s.append(id)
 
     def _get_highest_list(self, highest_list):

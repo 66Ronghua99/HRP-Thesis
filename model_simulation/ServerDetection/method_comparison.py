@@ -1,17 +1,67 @@
-from ServerDetection.server2 import Server2
 from copy import deepcopy
 import copy
+import numpy as np
+from ServerDetection.server import Server
 
 
-class ComparisonServer(Server2):
+class AllCombinationServer(Server):
+
+    def __init__(self, num=16):
+        super().__init__(num)
+        self.threshold = self.calculate_threshold()
+
+    # All possible combinations of sentries are considered
+    def _add_score(self):
+        listeners = self.listeners.copy()
+        broadcasters = self.broadcasters.copy()
+        ptr1 = 0
+        ptr2 = 1
+        while True:
+            id0 = listeners[ptr1]
+            id1 = listeners[ptr2]
+            ptr2 += 1
+            if ptr2 == len(listeners):
+                ptr1 += 1
+                ptr2 = ptr1 + 1
+            self._add_task(self.suspect, id0, id1,
+                           self.rssi_list[id0], self.rssi_list[id1], listeners, broadcasters)
+            if ptr1 + 1 == len(listeners):
+                break
+
+    def calculate_threshold(self):
+        num = self.node_num
+        rnd = self.rnd
+        return (int(num/5) * (int(num/5) - 1))/2 * rnd
+
+
+class NRoundServer(AllCombinationServer):
+    def __init__(self, num=16):
+        super().__init__(num)
+        self.rnd = self.node_num
+        self.rounds = np.zeros((self.node_num, self.rnd), dtype=int).tolist()
+        self.n_rounds()
+        pass
+
+    def n_rounds(self):
+        pvt = 0
+        for i in range(len(self.rounds[0])):
+            for j in range(len(self.rounds)):
+                if j < self.node_num/2:
+                    self.rounds[(pvt + j)%self.node_num][i] = 1
+                else:
+                    self.rounds[(j + pvt)%self.node_num][i] = 0
+            pvt += 1
+
+
+class ComparisonServer(AllCombinationServer):
     def __init__(self, num):
         super().__init__(num)
         self.hunter_list = []
 
     def init_hunters(self):
         self.hunter_list.append(
-            ThresholdOnly(self.score_list.copy(), deepcopy(self.sentry_record),
-                          self.normal_list.copy(), self.node_num, self.rnd))
+            ThresholdOnlyServer(self.score_list.copy(), deepcopy(self.sentry_record),
+                                self.normal_list.copy(), self.node_num, self.rnd))
         self.hunter_list.append(
             PreviousEviction(self.score_list.copy(), deepcopy(self.sentry_record),
                              self.normal_list.copy(), self.node_num, self.rnd))
@@ -24,7 +74,7 @@ class ComparisonServer(Server2):
             hunter.hunt()
 
 
-class ThresholdOnly:
+class ThresholdOnlyServer:
     def __init__(self, score_list, sentry_record, normal_list, num, rnd):
         self.score_list: list = score_list
         self.sentry_record: dict = sentry_record
@@ -45,7 +95,7 @@ class ThresholdOnly:
                 self.normal_list.remove(id)
 
 
-class PreviousEviction(ThresholdOnly):
+class PreviousEviction(ThresholdOnlyServer):
     def hunt(self):
         self.threshold = self.calculate_threshold()
         while True:
@@ -84,6 +134,6 @@ class PreviousEviction(ThresholdOnly):
         return True
 
 
-class ScoreOnlyServer(Server2):
+class ScoreOnlyServer(AllCombinationServer):
     def hunt(self):
         print("Detection results:", self.normal_list, self.score_list, len(self.normal_list))
