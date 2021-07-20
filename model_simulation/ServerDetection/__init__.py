@@ -1,9 +1,8 @@
-from ServerDetection.model import Model
+from ServerDetection.model import Model, NormalSybilModel
 from ServerDetection.utils import statistics, score_statistics, method_statistics
 from ServerDetection.log import log
 from ServerDetection.server import Server
-from ServerDetection.server2 import Server2
-from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer
+from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer, AllCombinationServer, NRoundServer
 
 fp: list = []
 fn: list = []
@@ -17,7 +16,19 @@ avg_s = []
 
 def basic():
     for i in range(2000):
-        model = Model(10, 0.4, 0)
+        model = Model(16, 0.4, 2)
+        model.main_process()
+
+
+def n_rounds_server_model():
+    for i in range(2000):
+        model = Model(10, 0.4, 1, server=5)
+        model.main_process()
+
+
+def normal_sybil_model():
+    for i in range(2000):
+        model = NormalSybilModel(16, 0.4, 0)
         model.main_process()
 
 
@@ -94,7 +105,7 @@ def eviction_comparison(filename):
 def average_score_statistics():
     for i in range(10, 41, 5):
         for j in range(50):
-            model = Model(20, i/100, server="score")
+            model = Model(20, i / 100, server="score")
             model.main_process()
             server: Server = model.server
             score_statistics(server.score_list, model.normals, model.sybils, n_score, s_score)
@@ -107,8 +118,10 @@ def average_score_statistics():
 
 
 if __name__ == '__main__':
-    # basic()
+    basic()
+    # n_rounds_server_model()
+    # normal_sybil_model()
     # score_comparison()
     # score_comparison(server="server2")
     # eviction_comparison("eviction_comparison.txt")
-    average_score_statistics()
+    # average_score_statistics()

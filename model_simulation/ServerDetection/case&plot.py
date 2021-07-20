@@ -1,6 +1,7 @@
 from matplotlib import transforms
 
 from ServerDetection.server import Server
+from ServerDetection.method_comparison import AllCombinationServer, NRoundServer
 from ServerDetection.utils import euclidean_d
 import json
 import ast
@@ -58,9 +59,10 @@ def case_test():
     print("Sybils:", s_list)
     print("Normals:", n_list)
     print("Malicious:", m_list)
-    server = Server(len(s_list) + len(n_list) + len(m_list))
+    server = NRoundServer(len(s_list) + len(n_list) + len(m_list))
     server.sentry_record = sentry_record
     server.score_list = score
+    # server.rnd = server.node_num
     server.process_finished()
     server._add_task(exit)
     server.threads[0].join()
@@ -192,7 +194,7 @@ def plot_avg_score():
     plt.bar([i - 0.5 for i in x_axis], avg_n, 1, color='b', label="normal nodes")
     plt.bar([i + 0.5 for i in x_axis], avg_s, 1, color='r', label="Sybil nodes")
     plt.xticks(x_axis, x_axis)
-    plt.xlabel("Percentage of Sybil nodes", fontsize=15)
+    plt.xlabel("Percentage of Sybil nodes/%", fontsize=15)
     plt.ylabel("Average score of nodes/%", fontsize=15)
     plt.axhline(48, 0, 40, color='y', linestyle='--', linewidth=2)
     plt.text(5.6, 47, "48", size="medium")
@@ -203,8 +205,8 @@ def plot_avg_score():
 if __name__ == '__main__':
     pass
     # server_test()
-    # case_test()
+    case_test()
     # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
-    plot_sentry_comparison()
-    plot_eviction_comparison()
-    plot_avg_score()
+    # plot_sentry_comparison()
+    # plot_eviction_comparison()
+    # plot_avg_score()
