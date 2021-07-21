@@ -1,7 +1,7 @@
 from matplotlib import transforms
 
 from ServerDetection.server import Server
-from ServerDetection.method_comparison import AllCombinationServer, NRoundServer
+from ServerDetection.child_servers import AllCombinationServer, NRoundServer
 from ServerDetection.utils import euclidean_d
 import json
 import ast

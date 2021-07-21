@@ -1,13 +1,16 @@
 import random
+
+import numpy as np
+
 from ServerDetection.server import Server
 from ServerDetection.node import Node
 from ServerDetection.utils import set_s_n
 from ServerDetection.log import log
-from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer, AllCombinationServer, NRoundServer
+from ServerDetection.child_servers import ComparisonServer, ScoreOnlyServer, AllCombinationServer, NRoundServer
 
 
 class Model:
-    def __init__(self, node_num, sybil_percent, malicious=0, server=1):
+    def __init__(self, node_num, sybil_percent, malicious=0, server=1, error_rate=0.0):
         global normals
         self.server = self._init_server(server, node_num)
         self.counts = node_num
@@ -19,6 +22,7 @@ class Model:
         self.malicious: [] = []
         self.malicious_ap: {} = {}
         self.sybils = None
+        self.error_rate = error_rate
         self.init_evils(sybil_percent, malicious)
         self.init_nodes()
         pass
@@ -54,11 +58,9 @@ class Model:
             self.server.begin_round()
             broadcasters = self.server.broadcast_node_list
             listeners = self.server.listen_node_list
-            locations = None
-            signal_strength = None
             locations, signal_strength = self._init_broadcasters(broadcasters)
-            for r in listeners:
-                node: Node = self.nodes[r]
+            for l in listeners:
+                node: Node = self.nodes[l]
                 if not node.is_evil:
                     self._normal_receiver_behavior(node, locations, signal_strength, broadcasters)
                 else:
@@ -95,7 +97,7 @@ class Model:
             else:
                 normals.append(id)
         self._normal_b_behavior(locations, normals)  # Later Sybil may use some other malicious devices to broadcast, loc changed
-        if len(vacant_malicious) < 0:
+        if len(vacant_malicious) == 0:
             self._normal_b_behavior(locations, sybils)
         else:
             self._sybil_b_behavior(locations, sybils, vacant_malicious)
@@ -128,7 +130,10 @@ class Model:
     def _normal_b_behavior(self, locations, lists):
         for id in lists:
             node: Node = self.nodes[id]
-            locations[id] = node.get_loc()  # Later Sybil may use some other malicious devices to broadcast, loc changed
+            if np.random.choice([0, 1], p=[self.error_rate, 1 - self.error_rate]) == 1:
+                locations[id] = node.get_loc()
+            else:
+                locations[id] = [0, 0]
 
     def _normal_receiver_behavior(self, node, locations, signal_strength, broadcasters):
         for b in broadcasters:

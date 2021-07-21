@@ -2,7 +2,7 @@ from ServerDetection.model import Model, NormalSybilModel
 from ServerDetection.utils import statistics, score_statistics, method_statistics
 from ServerDetection.log import log
 from ServerDetection.server import Server
-from ServerDetection.method_comparison import ComparisonServer, ScoreOnlyServer, AllCombinationServer, NRoundServer
+from ServerDetection.child_servers import ComparisonServer, ScoreOnlyServer, AllCombinationServer, NRoundServer
 
 fp: list = []
 fn: list = []
@@ -16,7 +16,7 @@ avg_s = []
 
 def basic():
     for i in range(2000):
-        model = Model(16, 0.4, 2)
+        model = Model(16, 0.4, 0, error_rate=0.1)
         model.main_process()
 
 
