@@ -203,7 +203,6 @@ def plot_avg_score():
 
 
 def diff_ap_average_score_plot():
-    # TODO: 有点重复，绘图问题
     avg_n = [[], [], []]
     avg_s = [[], [], []]
     counter = 0
@@ -224,15 +223,47 @@ def diff_ap_average_score_plot():
         plt.bar([i - 0.1 for i in x_axis], [float(i) for i in avg_n[j]], 0.2, color='b', label="normal nodes")
         plt.bar([i + 0.1 for i in x_axis], [float(i) for i in avg_s[j]], 0.2, color='r', label="Sybil nodes")
         plt.xticks(x_axis, x_axis)
-        plt.xlabel("Number of nodes/%", fontsize=15)
-        plt.ylabel("Average score of nodes/%", fontsize=15)
+        plt.xlabel("Number of nodes", fontsize=15)
+        plt.ylabel("Average score", fontsize=15)
         plt.legend(prop={'size': 15})
         plt.show()
         plt.clf()
 
 
+def diff_ap_eviction_rate():
+    ctr1 = 0
+    ctr2 = 0
+    evic_n = [[], [], []]
+    evic_s = [[], [], []]
+    with open("eviction_rate.txt", "r+") as file:
+        for line in file:
+            line.strip()
+            if line == "\n":
+                continue
+            if ctr1 % 2 == 0:
+                evic_n[ctr2] = ast.literal_eval(line)
+            else:
+                evic_s[ctr2] = ast.literal_eval(line)
+                ctr2 += 1
+            ctr1 += 1
+    print(evic_n)
+    print(evic_s)
+    x_axis = list(range(10, 24))
+    for j in range(3):
+        plt.plot(x_axis, [float(i)*100 for i in evic_n[j]], "o-", color='b', label="normal nodes")
+        plt.plot(x_axis, [float(i)*100 for i in evic_s[j]], "o-", color='r', label="sybil nodes")
+        plt.xticks(x_axis, x_axis[::1])
+        plt.xlabel("number of nodes", fontsize=18)
+        plt.ylabel("Sybil eviction rate/%", fontsize=18)
+        plt.legend(prop={'size': 17})
+        plt.show()
+        plt.clf()
+
+
+
 if __name__ == '__main__':
     pass
+    # diff_ap_eviction_rate()
     diff_ap_average_score_plot()
     # server_test()
     # case_test()

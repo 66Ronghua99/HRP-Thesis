@@ -103,12 +103,12 @@ def eviction_comparison(filename):
         for i in range(10, 24):
             fn.append(0)
             fp.append(0)
-            for j in range(200):
+            for j in range(1000):
                 model = Model(i, 0.4, k)
                 model.main_process()
                 statistics(model.normals, model.sybils, model.server.normal_list, fn, fp)
-        log(['{:.4f}'.format(i) for i in (np.array(fn) / (200 * (i - int(i * 0.4)))).tolist()], file=filename)
-        log(['{:.4f}'.format(i) for i in (np.array(fp) / (200 * int(i * 0.4))).tolist()], file=filename)
+        log(['{:.4f}'.format(i) for i in (np.array(fn) / (1000 * (i - int(i * 0.4)))).tolist()], file=filename)
+        log(['{:.4f}'.format(i) for i in (np.array(fp) / (1000 * int(i * 0.4))).tolist()], file=filename)
         log(file=filename)
         fn.clear()
         fp.clear()
