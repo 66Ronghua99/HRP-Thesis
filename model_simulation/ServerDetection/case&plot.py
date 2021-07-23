@@ -202,10 +202,40 @@ def plot_avg_score():
     plt.show()
 
 
+def diff_ap_average_score_plot():
+    # TODO: 有点重复，绘图问题
+    avg_n = [[], [], []]
+    avg_s = [[], [], []]
+    counter = 0
+    ctr = 0
+    with open("ap_diff_score.txt", "r") as file:
+        for line in file:
+            line.strip()
+            if counter % 2 == 0:
+                avg_n[ctr] = ast.literal_eval(line)
+            else:
+                avg_s[ctr] = ast.literal_eval(line)
+                ctr += 1
+            counter += 1
+    x_axis = list(range(10, 24))
+    print(avg_n, "\n", avg_s)
+
+    for j in range(3):
+        plt.bar([i - 0.1 for i in x_axis], [float(i) for i in avg_n[j]], 0.2, color='b', label="normal nodes")
+        plt.bar([i + 0.1 for i in x_axis], [float(i) for i in avg_s[j]], 0.2, color='r', label="Sybil nodes")
+        plt.xticks(x_axis, x_axis)
+        plt.xlabel("Number of nodes/%", fontsize=15)
+        plt.ylabel("Average score of nodes/%", fontsize=15)
+        plt.legend(prop={'size': 15})
+        plt.show()
+        plt.clf()
+
+
 if __name__ == '__main__':
     pass
+    diff_ap_average_score_plot()
     # server_test()
-    case_test()
+    # case_test()
     # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])
     # plot_sentry_comparison()
     # plot_eviction_comparison()
