@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.ronghua.selfcheck">
+    package="com.ronghua.deviceselfcheck">
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
@@ -24,19 +24,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="HardcodedDebugMode">
-        <activity android:name=".DetectResultActivity">
+        <activity android:name="com.ronghua.deviceselfcheck.DetectResultActivity">
         </activity>
-        <activity android:name="com.ronghua.selfcheck.MainActivity">
+        <activity android:name="com.ronghua.deviceselfcheck.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WiFiResultActivity"/>
+        <activity android:name="com.ronghua.deviceselfcheck.WiFiResultActivity"/>
 
         <service
-            android:name=".IsolatedService"
+            android:name="com.ronghua.deviceselfcheck.IsolatedService"
             android:enabled="true"
             android:isolatedProcess="true"
             android:process=":IsolatedProcess" />

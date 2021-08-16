@@ -1,0 +1,184 @@
+POST http://localhost:8080/sign/csr
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Accept: */*
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: */*
+Cache-Control: no-cache
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: application/json
+
+###
+
+GET http://www.baidu.com?hi=hello
+Accept: application/json
+
+<> 2021-06-06T133420.200.html
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Accept: */*
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64csr": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Accept: */*
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+#### 一般GET请求
+GET http://www.baidu.com?hi=hello
+Accept: application/json
+###
+
+GET http://localhost:8080/sign/str
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: application/json
+
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: */*
+Cache-Control: no-cache
+Content-Type: application/json; charset=UTF-8
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: */*
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: application/json
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: */*
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: text/plain
+Content-Type: text/plain
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: text/plain
+
+###
+
+GET http://localhost:8080/sign/str
+Accept: text/plain
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+GET http://127.0.0.1:8080/sign/str
+
+###
+
+GET http://127.0.0.1:8080/sign/str
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+POST http://127.0.0.1:8080/sign/csr
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+POST http://localhost:8080/sign/csr
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
+POST http://localhost:8080/csr
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "ronghua",
+  "base64CSR": "MIIBCDCBswIBADAsMQ4wDAYDVQQDDAVDaGluYTEMMAoGA1UECgwDS1RIMQwwCgYDVQQLDANOU1MwXDANBgkqhkiG9w0BAQEFAANLADBIAkEAmbufZ1rtCCD6077pZEAyUzMImmY8oQ3CZT30GeulP3kB1ORi36nTcPjae3f/u8+7o9ovNO2ZeWuR8zbxpg/c9QIDAQABoCIwIAYJKoZIhvcNAQkOMRMwETAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA0EAYB65w/yfgKRAwmTReawHm0qor8myYKtI5RXKhr4bdOdWXjHje9KMUSHkOw77kThfKHmltV/baIUyM3A5DufpvA=="
+}
+
+###
+
