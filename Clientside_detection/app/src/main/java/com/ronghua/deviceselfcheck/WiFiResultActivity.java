@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck;
+package com.ronghua.deviceselfcheck;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;

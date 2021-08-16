@@ -38,12 +38,12 @@ static const char *suPaths[] = {
 };
 
 JNIEXPORT void JNICALL
-Java_com_ronghua_selfcheck_Native_isLibLoaded(JNIEnv *env, jclass clazz) {
+Java_com_ronghua_deviceselfcheck_Native_isLibLoaded(JNIEnv *env, jclass clazz) {
     isLibLoaded = true;
 }
 
 
-JNIEXPORT jboolean Java_com_ronghua_selfcheck_Native_detectMagiskNative(
+JNIEXPORT jboolean Java_com_ronghua_deviceselfcheck_Native_detectMagiskNative(
         JNIEnv* env, jclass clazz) {
     LOGI("Hello from Native C code");
     bool bRet = false;
@@ -121,10 +121,15 @@ static inline bool isSuPathDetected(){
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_ronghua_selfcheck_Native_detectRootNative(JNIEnv *env, jclass clazz) {
+Java_com_ronghua_deviceselfcheck_Native_detectRootNative(JNIEnv *env, jclass clazz) {
     bool bRet = isSuPathDetected();
     if(bRet)
         return JNI_TRUE;
     else
         return JNI_FALSE;
+
+}
+JNIEXPORT jboolean JNICALL
+Java_com_ronghua_deviceselfcheck_Native_isSuExist(JNIEnv *env, jclass clazz) {
+    return isSuPathDetected();
 }

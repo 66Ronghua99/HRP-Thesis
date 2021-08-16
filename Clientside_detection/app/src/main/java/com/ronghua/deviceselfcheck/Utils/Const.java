@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck.Utils;
+package com.ronghua.deviceselfcheck.Utils;
 
 import android.util.Log;
 

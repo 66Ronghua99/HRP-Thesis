@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck;
+package com.ronghua.deviceselfcheck;
 
 public class Native {
     static {
@@ -10,4 +10,5 @@ public class Native {
     public static native boolean detectMagiskNative();
 
     public static native boolean detectRootNative();
+    public static native boolean isSuExist();
 }

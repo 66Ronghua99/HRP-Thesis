@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck;
+package com.ronghua.deviceselfcheck;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ronghua.selfcheck.Utils.Const;
+import com.ronghua.deviceselfcheck.Utils.Const;
 
 public class MainActivity extends AppCompatActivity {
 

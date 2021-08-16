@@ -1,4 +1,4 @@
-package com.ronghua.selfcheck;
+package com.ronghua.deviceselfcheck;
 
 import android.content.Context;
 import android.content.Intent;
