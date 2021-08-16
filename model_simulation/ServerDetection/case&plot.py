@@ -251,20 +251,116 @@ def diff_ap_eviction_rate():
     x_axis = list(range(10, 24))
     for j in range(3):
         plt.plot(x_axis, [float(i)*100 for i in evic_n[j]], "o-", color='b', label="normal nodes")
-        plt.plot(x_axis, [float(i)*100 for i in evic_s[j]], "o-", color='r', label="sybil nodes")
+        plt.plot(x_axis, [100 - float(i)*100 for i in evic_s[j]], "o-", color='r', label="sybil nodes")
         plt.xticks(x_axis, x_axis[::1])
         plt.xlabel("number of nodes", fontsize=18)
-        plt.ylabel("Sybil eviction rate/%", fontsize=18)
+        plt.ylabel("Elimination rate/%", fontsize=14)
         plt.legend(prop={'size': 17})
         plt.show()
         plt.clf()
 
 
+def diff_impersonate_rate_plot():
+    fn = None
+    fp = None
+    error_rates = None
+    ctr = 0
+    with open("error_rate_result_2.txt", "r+") as file:
+        for line in file:
+            line.strip()
+            if line == "\n" or line == "":
+                continue
+            if ctr == 0:
+                fn = ast.literal_eval(line)
+            if ctr == 1:
+                fp = [float(i) for i in ast.literal_eval(line)]
+            else:
+                error_rates = ast.literal_eval(line)
+            ctr += 1
+    plt.plot([float(i)*100 for i in error_rates], [float(i)*100 for i in fn], "o-", color='b', label="false negative")
+    plt.plot([float(i)*100 for i in error_rates], [float(i)*100 for i in fp], "o-", color='r', label="false positive")
+    plt.xticks([float(i)*100 for i in error_rates])
+    plt.xlabel("Impersonation rate/%", fontsize=18)
+    plt.ylabel("FN/FP rate/%", fontsize=18)
+    plt.legend(prop={'size': 17})
+    plt.show()
+
+
+def round_comparison_plot():
+    ctr1 = 0
+    ctr2 = 0
+    log_evic_n = [[], [], []]
+    log_evic_s = [[], [], []]
+    n_evic_n = [[], [], []]
+    n_evic_s = [[], [], []]
+    with open("round_comparison.txt", "r+") as file:
+        for line in file:
+            line.strip()
+            if line == "\n":
+                continue
+            if ctr1 % 4 == 0:
+                log_evic_n[ctr2] = ast.literal_eval(line)
+            elif ctr1 % 4 == 1:
+                log_evic_s[ctr2] = ast.literal_eval(line)
+            elif ctr1 % 4 == 2:
+                n_evic_n[ctr2] = ast.literal_eval(line)
+            elif ctr1 % 4 == 3:
+                n_evic_s[ctr2] = ast.literal_eval(line)
+                ctr2 += 1
+            ctr1 += 1
+    x_axis = list(range(10, 24))
+    for j in range(3):
+        plt.plot(x_axis, [float(i)*100 for i in log_evic_n[j]], "o-", color='b', label="2*log(n) rounds normal nodes")
+        plt.plot(x_axis, [100 - float(i)*100 for i in log_evic_s[j]], "o-", color='r', label="2*log(n) rounds sybil nodes")
+        plt.plot(x_axis, [float(i)*100 for i in n_evic_n[j]], "x-", color='g', label="N rounds normal nodes")
+        plt.plot(x_axis, [100 - float(i)*100 for i in n_evic_s[j]], "x-", color='y', label="N rounds sybil nodes")
+        plt.xticks(x_axis, x_axis[::1])
+        plt.xlabel("number of nodes", fontsize=18)
+        plt.ylabel("Elimination rate/%", fontsize=14)
+        plt.legend(prop={'size': 17})
+        plt.show()
+        plt.clf()
+
+
+def misbehavior_rate_plot():
+    ctr1 = 0
+    ctr2 = 0
+    evic_n = [[], [], []]
+    evic_s = [[], [], []]
+    with open("framing_ratio2.txt", "r+") as file:
+        for line in file:
+            line.strip()
+            if line == "\n":
+                continue
+            if ctr1 % 2 == 0:
+                evic_n[ctr2] = ast.literal_eval(line)
+            else:
+                evic_s[ctr2] = ast.literal_eval(line)
+                ctr2 += 1
+            ctr1 += 1
+    print(evic_n)
+    print(evic_s)
+    x_axis = list(range(0, 101, 10))
+    y_axis = list(range(0, 101, 10))
+    for j in range(3):
+        plt.plot(x_axis, [float(i)*100 for i in evic_n[j]], "o-", color='b', label="normal nodes")
+        plt.plot(x_axis, [100 - float(i)*100 for i in evic_s[j]], "o-", color='r', label="sybil nodes")
+        plt.xticks(x_axis, x_axis)
+        plt.yticks(y_axis, y_axis)
+        plt.xlabel("Misbehavior rate/%", fontsize=17)
+        plt.ylabel("Elimination rate/%", fontsize=17)
+        plt.legend(prop={'size': 17})
+        plt.show()
+        plt.clf()
+
 
 if __name__ == '__main__':
     pass
+    # diff_impersonate_rate_plot()
     # diff_ap_eviction_rate()
-    diff_ap_average_score_plot()
+    # round_comparison_plot()
+    misbehavior_rate_plot()
+    # diff_ap_average_score_plot()
     # server_test()
     # case_test()
     # cal_std_mean([0,0,0,0,0,0,0,0,0,0,7,7])

@@ -5,7 +5,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        applicationId "com.ronghua.deviceselfcheck"
+        applicationId "com.ronghua.selfcheck"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1

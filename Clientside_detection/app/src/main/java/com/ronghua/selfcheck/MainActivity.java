@@ -17,7 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ronghua.root_emu.Utils.Const;
+import com.ronghua.selfcheck.Utils.Const;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,31 +81,31 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.wifi).setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               mWiFiInfo = WiFiInfo.getInstance(getApplicationContext());
-               mWiFiInfo.enableWiFi();
-               mWiFiInfo.wifiScanList();
-               Intent intent = new Intent(getApplicationContext(), WiFiResultActivity.class);
-               intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-               getApplicationContext().startActivity(intent);
-           }
-       });
+//        findViewById(R.id.wifi).setOnClickListener(new View.OnClickListener() {
+//           @Override
+//           public void onClick(View v) {
+//               mWiFiInfo = WiFiInfo.getInstance(getApplicationContext());
+//               mWiFiInfo.enableWiFi();
+//               mWiFiInfo.wifiScanList();
+//               Intent intent = new Intent(getApplicationContext(), WiFiResultActivity.class);
+//               intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//               getApplicationContext().startActivity(intent);
+//           }
+//       });
+//
+//        findViewById(R.id.hotspot).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                HardwareExamination.getInstance(getApplicationContext()).enableAp();
+//            }
+//        });
 
-        findViewById(R.id.hotspot).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HardwareExamination.getInstance(getApplicationContext()).enableAp();
-            }
-        });
-
-        findViewById(R.id.hotspot2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HardwareExamination.getInstance(getApplicationContext()).disableAp();
-            }
-        });
+//        findViewById(R.id.hotspot2).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                HardwareExamination.getInstance(getApplicationContext()).disableAp();
+//            }
+//        });
 
     }
 

@@ -1,5 +1,5 @@
 // IIsolatedProcess.aidl
-package com.ronghua.deviceselfcheck;
+package com.ronghua.selfcheck;
 
 // Declare any non-default types here with import statements
 

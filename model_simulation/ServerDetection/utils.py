@@ -41,11 +41,11 @@ def set_s_n(s, n):
     normals = n
 
 
-def statistics(normal_list, sybil_list, result_list, fn, fp):
+def statistics(normal_list, sybil_list, malicious_list, result_list, fn, fp):
     for id in normal_list:
         if id not in result_list:
             fn[-1] += 1
-    for id in sybil_list:
+    for id in sybil_list or id in malicious_list:
         if id in result_list:
             fp[-1] += 1
 

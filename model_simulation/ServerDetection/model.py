@@ -62,10 +62,10 @@ class Model:
             for l in listeners:
                 node: Node = self.nodes[l]
                 if not node.is_evil:
-                    self._normal_receiver_behavior(node, locations, signal_strength, broadcasters)
+                    self._normal_receiver_behavior(node, locations, signal_strength, broadcasters, self.server)
                 else:
                     # Sybil receiver behavior
-                    self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters)
+                    self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters, self.server)
         self.server.process_finished()
         self.server.threads[0].join()
         log()
@@ -135,19 +135,19 @@ class Model:
             else:
                 locations[id] = [0, 0]
 
-    def _normal_receiver_behavior(self, node, locations, signal_strength, broadcasters):
+    def _normal_receiver_behavior(self, node, locations, signal_strength, broadcasters, server):
         for b in broadcasters:
             node.set_rssi(b, locations[b], signal_strength[b])
-        node.report(self.server)
+        node.report(server)
 
-    def _sybil_receiver_behavior(self, node, locations, signal_strength, broadcasters):
+    def _sybil_receiver_behavior(self, node, locations, signal_strength, broadcasters, server):
         for b in broadcasters:
             if b in self.normals:
                 node.set_rssi(b, [21, 21], 1)
             else:
                 sybil: Node = self.nodes[b]
                 node.set_rssi(b, sybil.gps_loc, 1)
-        node.report(self.server)
+        node.report(server)
 
     def _init_server(self, server, num):
         if server == 0:
@@ -163,8 +163,45 @@ class Model:
 
 
 class NormalSybilModel(Model):
-    def _sybil_receiver_behavior(self, node, locations, signal_strength, broadcasters):
-        self._normal_receiver_behavior(node, locations, signal_strength, broadcasters)
+    def __init__(self, node_num, sybil_percent, malicious=0, server=1, error_rate=0.0, frame_ratio=0.0):
+        super().__init__(node_num, sybil_percent, malicious, server, error_rate)
+        self.frame_ratio = frame_ratio
+
+    def _sybil_receiver_behavior(self, node, locations, signal_strength, broadcasters, server):
+        if np.random.choice([0, 1], p=[self.frame_ratio, 1-self.frame_ratio]) == 1:
+            self._normal_receiver_behavior(node, locations, signal_strength, broadcasters, server)
+        else:
+            super()._sybil_receiver_behavior(node, locations, signal_strength, broadcasters, server)
+
+
+class DiffRoundModel(Model):
+    def __init__(self, node_num, sybil_percent, malicious=0):
+        super().__init__(node_num, sybil_percent, malicious)
+        self.server_list = []
+        self.server_list.append(self.server)
+        self.server_list.append(NRoundServer(node_num))
+
+    def main_process(self):
+        # broadcasting and receiving process
+        log("Sybils:", self.sybils)
+        log("Normals:", self.normals)
+        log("Malicious:", self.malicious)
+        for server in self.server_list:
+            for rnd in range(server.total_rnds):
+                server.begin_round()
+                broadcasters = server.broadcast_node_list
+                listeners = server.listen_node_list
+                locations, signal_strength = self._init_broadcasters(broadcasters)
+                for l in listeners:
+                    node: Node = self.nodes[l]
+                    if not node.is_evil:
+                        self._normal_receiver_behavior(node, locations, signal_strength, broadcasters, server)
+                    else:
+                        # Sybil receiver behavior
+                        self._sybil_receiver_behavior(node, locations, signal_strength, broadcasters, server)
+            server.process_finished()
+            server.threads[0].join()
+        log()
 
 
 class Maps:

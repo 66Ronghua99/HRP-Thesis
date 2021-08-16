@@ -8,4 +8,6 @@ public class Native {
     public static native void isLibLoaded();
 
     public static native boolean detectMagiskNative();
+
+    public static native boolean detectRootNative();
 }

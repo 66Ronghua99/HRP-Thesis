@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
-import com.ronghua.root_emu.Utils.Property;
+import com.ronghua.selfcheck.Utils.Property;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -328,7 +328,7 @@ public final class EmulatorDetector {
         result |= "google_sdk".equals(Build.PRODUCT);
         return result;
     }
-
+    //TODO: Native implementation
     private boolean checkAdvanced() {
         boolean result = checkTelephony();
                 result |= checkFiles(GENY_FILES, "Geny");

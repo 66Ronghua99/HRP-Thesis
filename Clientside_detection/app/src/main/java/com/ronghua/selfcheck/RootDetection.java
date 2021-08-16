@@ -10,7 +10,8 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.ronghua.root_emu.Utils.Const;
+import com.ronghua.selfcheck.IIsolatedProcess;
+import com.ronghua.selfcheck.Utils.Const;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -85,6 +86,7 @@ public class RootDetection {
     private boolean checkRooted() throws RemoteException {
         boolean result = isSuExists();
                 result |= suFileDetection();
+                result |= detectRootNative();
                 result |= buildTagDetection();
                 result |= mountPathsDetection();
                 result |= rootAppDetection();
@@ -92,6 +94,14 @@ public class RootDetection {
                 result |= rootCloakingAppDetection();
                 result |= detectMagiskHide();
         return result;
+    }
+
+    private boolean detectRootNative() {
+        boolean isSuDetected = Native.detectRootNative();
+        if(isSuDetected){
+            rootTraitsList.add("SU file detected with native code");
+        }
+        return isSuDetected;
     }
 
     public boolean rootAppDetection(){
@@ -197,7 +207,7 @@ public class RootDetection {
     public boolean detectMagiskHide() throws RemoteException {
             boolean result = service.detectMagiskHide();
             if(result){
-                rootTraitsList.add("Root is detected with IsolatedProcess detection");
+                rootTraitsList.add("Magisk is detected with IsolatedProcess detection");
             }
             return result;
     }

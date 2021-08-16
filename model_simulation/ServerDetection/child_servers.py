@@ -31,7 +31,7 @@ class AllCombinationServer(Server):
     def calculate_threshold(self):
         num = self.node_num
         rnd = self.rnd
-        return (int(num/5) * (int(num/5) - 1))/2 * rnd
+        return (int(num/5) * (int(num/5) - 1))/2 * rnd/2
 
 
 class NRoundServer(AllCombinationServer):
