@@ -1,3 +1,5 @@
+import math
+
 from matplotlib import transforms
 
 from ServerDetection.server import Server
@@ -218,13 +220,20 @@ def diff_ap_average_score_plot():
             counter += 1
     x_axis = list(range(10, 24))
     print(avg_n, "\n", avg_s)
+    avg_t = []
+    for i in range(10, 24):
+        b = i/5
+        rnd = 2 * int(math.log(i, 2))
+        avg_t.append(rnd* b*(b-1)/2)
 
     for j in range(3):
-        plt.bar([i - 0.1 for i in x_axis], [float(i) for i in avg_n[j]], 0.2, color='b', label="normal nodes")
-        plt.bar([i + 0.1 for i in x_axis], [float(i) for i in avg_s[j]], 0.2, color='r', label="Sybil nodes")
+        plt.bar([i - 0.2 for i in x_axis], [float(i) for i in avg_n[j]], 0.2, color='b', label="normal nodes")
+        plt.bar([i + 0.2 for i in x_axis], [float(i) for i in avg_s[j]], 0.2, color='r', label="Sybil nodes")
+        plt.bar([i for i in x_axis], [float(i) for i in avg_t], 0.2, color='y', label="Threshold")
         plt.xticks(x_axis, x_axis)
+        plt.yticks(np.arange(0,100, 10), np.arange(0,100,10))
         plt.xlabel("Number of nodes", fontsize=15)
-        plt.ylabel("Average score", fontsize=15)
+        plt.ylabel("Average score", fontsize=15, labelpad=10)
         plt.legend(prop={'size': 15})
         plt.show()
         plt.clf()
@@ -253,7 +262,7 @@ def diff_ap_eviction_rate():
         plt.plot(x_axis, [float(i)*100 for i in evic_n[j]], "o-", color='b', label="normal nodes")
         plt.plot(x_axis, [100 - float(i)*100 for i in evic_s[j]], "o-", color='r', label="sybil nodes")
         plt.xticks(x_axis, x_axis[::1])
-        plt.xlabel("number of nodes", fontsize=18)
+        plt.xlabel("Number of nodes", fontsize=18)
         plt.ylabel("Elimination rate/%", fontsize=14)
         plt.legend(prop={'size': 17})
         plt.show()
@@ -265,7 +274,7 @@ def diff_impersonate_rate_plot():
     fp = None
     error_rates = None
     ctr = 0
-    with open("error_rate_result_2.txt", "r+") as file:
+    with open("error_rate_result3.txt", "r+") as file:
         for line in file:
             line.strip()
             if line == "\n" or line == "":
@@ -356,10 +365,10 @@ def misbehavior_rate_plot():
 
 if __name__ == '__main__':
     pass
-    # diff_impersonate_rate_plot()
+    diff_impersonate_rate_plot()
     # diff_ap_eviction_rate()
     # round_comparison_plot()
-    misbehavior_rate_plot()
+    # misbehavior_rate_plot()
     # diff_ap_average_score_plot()
     # server_test()
     # case_test()

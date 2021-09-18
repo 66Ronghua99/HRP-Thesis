@@ -37,7 +37,7 @@ def normal_sybil_model():
         model.main_process()
 
 
-def error_rate_difference(filename="error_rate_result.txt"):
+def error_rate_difference(filename="error_rate_result3.txt"):
     data_init()
     error_rate = 0.0
     for i in range(11):
@@ -45,7 +45,7 @@ def error_rate_difference(filename="error_rate_result.txt"):
         fp.append(0)
         error_rates.append(error_rate)
         for j in range(1000):
-            model = Model(16, 0.4, 0, error_rate=error_rate)
+            model = Model(16, 0.4, 2, error_rate=error_rate)
             model.main_process()
             statistics(model.normals, model.sybils, model.malicious, model.server.normal_list, fn, fp)
         error_rate += 0.01
@@ -157,14 +157,14 @@ def round_comparison(filename="round_comparison.txt"):
     pass
 
 
-def misbehavior_comparison(filename="framing_ratio2.txt"):
+def misbehavior_comparison(filename="framing_ratio3.txt"):
     for k in range(3):
         error_rate = 0.0
         for j in range(11):
             fn.append(0)
             fp.append(0)
             for i in range(100):
-                model = NormalSybilModel(16, 0.4, k, frame_ratio=error_rate, error_rate=0.1)
+                model = NormalSybilModel(16, 0.4, k, frame_ratio=error_rate, error_rate=0)
                 model.main_process()
                 statistics(model.normals, model.sybils, model.malicious, model.server.normal_list, fn, fp)
             error_rate += 0.1
@@ -177,10 +177,10 @@ def misbehavior_comparison(filename="framing_ratio2.txt"):
 
 if __name__ == '__main__':
     # basic()
-    # error_rate_difference()
+    error_rate_difference()
     # n_rounds_server_model()
     # normal_sybil_model()
-    misbehavior_comparison()
+    # misbehavior_comparison()
     # average_score()
     # score_comparison(server="server2")
     # eviction_comparison()

@@ -118,7 +118,7 @@ class Server(object):
                 score_sum = score_sum + node_score
                 self.score_list[node_id] = self.score_list[node_id] - node_score
             if self.score_list[company_id] >= 0:
-                self.score_list[company_id] = self.score_list[company_id] + score_sum
+                self.score_list[company_id] = self.score_list[company_id] + score_sum/2
             self.sentry_record[company_id].pop(node)
         self.sentry_record[node].clear()
         self.score_list[node] = -1
